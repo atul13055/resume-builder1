@@ -30,6 +30,9 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
   const fontSizeClass =
     theme.fontSize === 'sm' ? 'text-xs' : theme.fontSize === 'lg' ? 'text-sm' : 'text-[13px]';
 
+  const hiddenSections = theme.hiddenSections || [];
+  const isHidden = (sec: string) => hiddenSections.includes(sec);
+
   return (
     <div
       id="resume-printable-content"
@@ -128,7 +131,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
       {/* Main Sections */}
       <div className={spacingClasses.sectionGap}>
         {/* Professional Summary */}
-        {resume.summary && (
+        {!isHidden('summary') && resume.summary && (
           <section id="section-summary">
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2 pb-1 border-b-2 flex items-center justify-between"
@@ -141,7 +144,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         )}
 
         {/* Work Experience */}
-        {resume.experience && resume.experience.length > 0 && (
+        {!isHidden('experience') && resume.experience && resume.experience.length > 0 && (
           <section id="section-experience">
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2.5 pb-1 border-b-2"
@@ -180,7 +183,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         )}
 
         {/* Skills */}
-        {resume.skills && resume.skills.length > 0 && (
+        {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section id="section-skills">
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2 pb-1 border-b-2"
@@ -205,7 +208,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         )}
 
         {/* Projects */}
-        {resume.projects && resume.projects.length > 0 && (
+        {!isHidden('projects') && resume.projects && resume.projects.length > 0 && (
           <section id="section-projects">
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2.5 pb-1 border-b-2"
@@ -251,7 +254,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         )}
 
         {/* Education */}
-        {resume.education && resume.education.length > 0 && (
+        {!isHidden('education') && resume.education && resume.education.length > 0 && (
           <section id="section-education">
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2.5 pb-1 border-b-2"
@@ -288,44 +291,47 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         )}
 
         {/* Certifications & Languages Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {resume.certifications && resume.certifications.length > 0 && (
-            <section id="section-certifications">
-              <h2
-                className="text-xs font-bold uppercase tracking-wider mb-2 pb-1 border-b-2"
-                style={{ color: theme.primaryColor, borderColor: theme.accentColor }}
-              >
-                Certifications
-              </h2>
-              <ul className="space-y-1 text-slate-700 text-xs">
-                {resume.certifications.map((c) => (
-                  <li key={c.id}>
-                    <span className="font-semibold text-slate-900">{c.name}</span>
-                    <span className="text-slate-500"> – {c.issuer} ({c.issueDate})</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+        {((!isHidden('certifications') && resume.certifications && resume.certifications.length > 0) ||
+          (!isHidden('languages') && resume.languages && resume.languages.length > 0)) && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {!isHidden('certifications') && resume.certifications && resume.certifications.length > 0 && (
+              <section id="section-certifications">
+                <h2
+                  className="text-xs font-bold uppercase tracking-wider mb-2 pb-1 border-b-2"
+                  style={{ color: theme.primaryColor, borderColor: theme.accentColor }}
+                >
+                  Certifications
+                </h2>
+                <ul className="space-y-1 text-slate-700 text-xs">
+                  {resume.certifications.map((c) => (
+                    <li key={c.id}>
+                      <span className="font-semibold text-slate-900">{c.name}</span>
+                      <span className="text-slate-500"> – {c.issuer} ({c.issueDate})</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
 
-          {resume.languages && resume.languages.length > 0 && (
-            <section id="section-languages">
-              <h2
-                className="text-xs font-bold uppercase tracking-wider mb-2 pb-1 border-b-2"
-                style={{ color: theme.primaryColor, borderColor: theme.accentColor }}
-              >
-                Languages
-              </h2>
-              <div className="flex flex-wrap gap-2 text-xs text-slate-700">
-                {resume.languages.map((l) => (
-                  <span key={l.id} className="font-medium">
-                    {l.language} <span className="text-slate-500">({l.proficiency})</span>
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
+            {!isHidden('languages') && resume.languages && resume.languages.length > 0 && (
+              <section id="section-languages">
+                <h2
+                  className="text-xs font-bold uppercase tracking-wider mb-2 pb-1 border-b-2"
+                  style={{ color: theme.primaryColor, borderColor: theme.accentColor }}
+                >
+                  Languages
+                </h2>
+                <div className="flex flex-wrap gap-2 text-xs text-slate-700">
+                  {resume.languages.map((l) => (
+                    <span key={l.id} className="font-medium">
+                      {l.language} <span className="text-slate-500">({l.proficiency})</span>
+                    </span>
+                  ))}
+                </div>
+              </section>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

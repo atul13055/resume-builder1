@@ -109,7 +109,8 @@ export async function exportToDocx(resume: ResumeData, theme: ThemeConfig): Prom
     });
   }
 
-  const order = theme.sectionOrder || [
+  const hiddenSections = theme.hiddenSections || [];
+  const rawOrder = theme.sectionOrder || [
     'summary',
     'experience',
     'skills',
@@ -118,6 +119,7 @@ export async function exportToDocx(resume: ResumeData, theme: ThemeConfig): Prom
     'certifications',
     'languages',
   ];
+  const order = rawOrder.filter((secKey) => !hiddenSections.includes(secKey));
 
   order.forEach((secKey) => {
     // 4. Professional Summary

@@ -230,6 +230,57 @@ export const CustomizationDrawer: React.FC<CustomizationDrawerProps> = ({
           </div>
         </div>
 
+        {/* Section Visibility Toggles */}
+        <div className="space-y-2.5 pt-2 border-t border-slate-200">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <Eye className="w-3.5 h-3.5 text-blue-600" />
+              Resume Section Visibility
+            </label>
+            <span className="text-[10px] text-slate-400 font-medium">Toggle preview visibility</span>
+          </div>
+          <div className="space-y-1.5">
+            {[
+              { id: 'summary', label: 'Professional Summary' },
+              { id: 'experience', label: 'Work Experience' },
+              { id: 'skills', label: 'Skills & Expertise' },
+              { id: 'projects', label: 'Key Projects' },
+              { id: 'education', label: 'Education & Degrees' },
+              { id: 'certifications', label: 'Certifications' },
+              { id: 'languages', label: 'Languages' },
+            ].map((section) => {
+              const isHidden = (theme.hiddenSections || []).includes(section.id);
+              return (
+                <label
+                  key={section.id}
+                  className={`flex items-center justify-between p-2 rounded-lg border transition-all cursor-pointer ${
+                    isHidden
+                      ? 'bg-slate-50 border-slate-200 text-slate-400 opacity-80'
+                      : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 shadow-2xs'
+                  }`}
+                >
+                  <span className={`text-xs font-medium ${isHidden ? 'line-through' : ''}`}>
+                    {section.label}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={!isHidden}
+                    onChange={(e) => {
+                      const shouldBeVisible = e.target.checked;
+                      const currentHidden = theme.hiddenSections || [];
+                      const updatedHidden = shouldBeVisible
+                        ? currentHidden.filter((id) => id !== section.id)
+                        : [...currentHidden, section.id];
+                      onChangeTheme({ ...theme, hiddenSections: updatedHidden });
+                    }}
+                    className="rounded text-blue-600"
+                  />
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Display Toggles */}
         <div className="space-y-2.5 pt-2 border-t border-slate-200">
           <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">

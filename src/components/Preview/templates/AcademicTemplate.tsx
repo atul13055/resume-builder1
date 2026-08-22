@@ -20,6 +20,9 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
   const fontSizeClass =
     theme.fontSize === 'sm' ? 'text-xs' : theme.fontSize === 'lg' ? 'text-sm' : 'text-[13px]';
 
+  const hiddenSections = theme.hiddenSections || [];
+  const isHidden = (sec: string) => hiddenSections.includes(sec);
+
   return (
     <div
       id="resume-printable-content"
@@ -48,7 +51,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
 
       <div className="space-y-5">
         {/* Education (Often first in Academic/CV style) */}
-        {resume.education && resume.education.length > 0 && (
+        {!isHidden('education') && resume.education && resume.education.length > 0 && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-1 mb-2.5">
               Education
@@ -80,7 +83,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Summary / Research Focus */}
-        {resume.summary && (
+        {!isHidden('summary') && resume.summary && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-1 mb-2">
               Professional & Academic Statement
@@ -90,7 +93,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Experience */}
-        {resume.experience && resume.experience.length > 0 && (
+        {!isHidden('experience') && resume.experience && resume.experience.length > 0 && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-1 mb-2.5">
               Appointments & Professional Experience
@@ -119,7 +122,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Projects / Publications */}
-        {resume.projects && resume.projects.length > 0 && (
+        {!isHidden('projects') && resume.projects && resume.projects.length > 0 && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-1 mb-2.5">
               Projects & Research Contributions
@@ -145,7 +148,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Skills & Honors */}
-        {resume.skills && resume.skills.length > 0 && (
+        {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-1 mb-1.5">
               Areas of Expertise & Skills
@@ -157,9 +160,10 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Certifications & Languages */}
-        {((resume.certifications && resume.certifications.length > 0) || (resume.languages && resume.languages.length > 0)) && (
+        {((!isHidden('certifications') && resume.certifications && resume.certifications.length > 0) ||
+          (!isHidden('languages') && resume.languages && resume.languages.length > 0)) && (
           <div className="grid grid-cols-2 gap-4">
-            {resume.certifications && resume.certifications.length > 0 && (
+            {!isHidden('certifications') && resume.certifications && resume.certifications.length > 0 && (
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-stone-900 border-b border-stone-300 pb-0.5 mb-1.5">
                   Certifications
@@ -173,7 +177,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
                 </ul>
               </div>
             )}
-            {resume.languages && resume.languages.length > 0 && (
+            {!isHidden('languages') && resume.languages && resume.languages.length > 0 && (
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-stone-900 border-b border-stone-300 pb-0.5 mb-1.5">
                   Languages

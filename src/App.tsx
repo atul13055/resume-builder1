@@ -229,6 +229,7 @@ export default function App() {
             onUndo={undo}
             onRedo={redo}
             onChange={setResume}
+            onChangeTheme={setTheme}
             onOpenTailorModal={() => setIsTailorModalOpen(true)}
             onOpenAtsModal={() => setIsAtsModalOpen(true)}
             onOpenCustomization={() => setIsCustomizationOpen(true)}

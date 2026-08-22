@@ -63,7 +63,9 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
       </header>
 
       <div className={spacingClasses.sectionGap}>
-        {(theme.sectionOrder || ['summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'languages']).map((secKey) => {
+        {(theme.sectionOrder || ['summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'languages'])
+          .filter((secKey) => !(theme.hiddenSections || []).includes(secKey))
+          .map((secKey) => {
           if (secKey === 'summary' && resume.summary) {
             return (
               <section key="summary">

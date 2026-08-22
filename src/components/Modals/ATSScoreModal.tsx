@@ -19,13 +19,8 @@ import {
   Copy,
   Search,
   Layers,
-  ArrowRight,
   Eye,
   Briefcase,
-  BookOpen,
-  Code2,
-  User,
-  Info,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -80,6 +75,7 @@ export const ATSScoreModal: React.FC<ATSScoreModalProps> = ({
   onOpenTailorModal,
   onUpdateResume,
 }) => {
+  // All hooks MUST be declared unconditionally at the very top of the component
   const [activeTab, setActiveTab] = useState<'overview' | 'keywords' | 'highlightView'>('keywords');
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzingAi, setIsAnalyzingAi] = useState(false);
@@ -94,12 +90,36 @@ export const ATSScoreModal: React.FC<ATSScoreModalProps> = ({
   const [addedSkillAlert, setAddedSkillAlert] = useState<string | null>(null);
   const [highlightAllPlacements, setHighlightAllPlacements] = useState(true);
 
-  if (!isOpen) return null;
-
   // Real-time local keyword extraction & matching against resume
   const keywordAnalysis = useMemo(() => {
     return extractAndAnalyzeKeywords(jobDescription, resume);
   }, [jobDescription, resume]);
+
+  // Filtered keywords for inspector
+  const filteredKeywords = useMemo(() => {
+    let list = keywordAnalysis.keywords;
+    if (keywordFilter === 'missing') list = keywordAnalysis.missingKeywords;
+    if (keywordFilter === 'matched') list = keywordAnalysis.matchedKeywords;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (k) =>
+          k.term.toLowerCase().includes(q) ||
+          k.category.toLowerCase().includes(q) ||
+          k.suggestedPhrase.toLowerCase().includes(q)
+      );
+    }
+    return list;
+  }, [keywordAnalysis, keywordFilter, searchQuery]);
+
+  // List of all matched term strings for highlighting in resume text
+  const matchedTermStrings = useMemo(() => {
+    return keywordAnalysis.matchedKeywords.map((k) => k.term);
+  }, [keywordAnalysis.matchedKeywords]);
+
+  // If modal is not open, return null only AFTER all hooks are called
+  if (!isOpen) return null;
 
   const currentReport = aiReport || liveAtsResult;
   const score = currentReport.overallScore;
@@ -196,29 +216,6 @@ export const ATSScoreModal: React.FC<ATSScoreModalProps> = ({
     setTimeout(() => setAddedSkillAlert(null), 3000);
   };
 
-  // Filtered keywords for inspector
-  const filteredKeywords = useMemo(() => {
-    let list = keywordAnalysis.keywords;
-    if (keywordFilter === 'missing') list = keywordAnalysis.missingKeywords;
-    if (keywordFilter === 'matched') list = keywordAnalysis.matchedKeywords;
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      list = list.filter(
-        (k) =>
-          k.term.toLowerCase().includes(q) ||
-          k.category.toLowerCase().includes(q) ||
-          k.suggestedPhrase.toLowerCase().includes(q)
-      );
-    }
-    return list;
-  }, [keywordAnalysis, keywordFilter, searchQuery]);
-
-  // List of all matched term strings for highlighting in resume text
-  const matchedTermStrings = useMemo(() => {
-    return keywordAnalysis.matchedKeywords.map((k) => k.term);
-  }, [keywordAnalysis.matchedKeywords]);
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[92vh] flex flex-col overflow-hidden border border-slate-200">
@@ -308,7 +305,7 @@ export const ATSScoreModal: React.FC<ATSScoreModalProps> = ({
 
         {/* Modal Body */}
         <div className="flex-1 overflow-y-auto p-5 space-y-5">
-          {/* Job Description Paste Box (Always Accessible at Top for fast testing) */}
+          {/* Job Description Paste Box */}
           <div className="p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl space-y-3">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-1.5">
@@ -385,6 +382,9 @@ export const ATSScoreModal: React.FC<ATSScoreModalProps> = ({
                 <span>{isAnalyzingAi ? 'Analyzing...' : 'Deep AI ATS Audit'}</span>
               </button>
             </div>
+            {error && (
+              <p className="text-xs text-rose-600 font-semibold mt-1">{error}</p>
+            )}
           </div>
 
           {/* TAB 1: MISSING KEYWORDS INSPECTOR */}

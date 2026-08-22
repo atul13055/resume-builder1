@@ -21,6 +21,9 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
   const fontSizeClass =
     theme.fontSize === 'sm' ? 'text-[11px]' : theme.fontSize === 'lg' ? 'text-[13px]' : 'text-xs';
 
+  const hiddenSections = theme.hiddenSections || [];
+  const isHidden = (sec: string) => hiddenSections.includes(sec);
+
   return (
     <div
       id="resume-printable-content"
@@ -58,7 +61,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         {/* Left Main Column (8 cols) */}
         <div className="col-span-12 md:col-span-8 space-y-4">
           {/* Summary */}
-          {resume.summary && (
+          {!isHidden('summary') && resume.summary && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-1.5"
@@ -71,7 +74,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           )}
 
           {/* Work Experience */}
-          {resume.experience && resume.experience.length > 0 && (
+          {!isHidden('experience') && resume.experience && resume.experience.length > 0 && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-2"
@@ -103,7 +106,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           )}
 
           {/* Projects */}
-          {resume.projects && resume.projects.length > 0 && (
+          {!isHidden('projects') && resume.projects && resume.projects.length > 0 && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-2"
@@ -138,7 +141,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
         {/* Right Sidebar Column (4 cols) */}
         <div className="col-span-12 md:col-span-4 space-y-4 border-l md:border-slate-200 md:pl-4">
           {/* Skills */}
-          {resume.skills && resume.skills.length > 0 && (
+          {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-1.5"
@@ -160,7 +163,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           )}
 
           {/* Education */}
-          {resume.education && resume.education.length > 0 && (
+          {!isHidden('education') && resume.education && resume.education.length > 0 && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-1.5"
@@ -185,7 +188,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           )}
 
           {/* Certifications */}
-          {resume.certifications && resume.certifications.length > 0 && (
+          {!isHidden('certifications') && resume.certifications && resume.certifications.length > 0 && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-1.5"
@@ -205,7 +208,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           )}
 
           {/* Languages */}
-          {resume.languages && resume.languages.length > 0 && (
+          {!isHidden('languages') && resume.languages && resume.languages.length > 0 && (
             <section>
               <h2
                 className="text-[11px] font-black uppercase tracking-wider border-b pb-0.5 mb-1.5"

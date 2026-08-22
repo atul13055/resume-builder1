@@ -21,6 +21,9 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
   const fontSizeClass =
     theme.fontSize === 'sm' ? 'text-xs' : theme.fontSize === 'lg' ? 'text-sm' : 'text-[13px]';
 
+  const hiddenSections = theme.hiddenSections || [];
+  const isHidden = (sec: string) => hiddenSections.includes(sec);
+
   return (
     <div
       id="resume-printable-content"
@@ -99,7 +102,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
           </div>
 
           {/* Skills Badges in Sidebar */}
-          {resume.skills && resume.skills.length > 0 && (
+          {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
             <div>
               <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-3">
                 Skills & Tech
@@ -118,7 +121,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
           )}
 
           {/* Education in Sidebar */}
-          {resume.education && resume.education.length > 0 && (
+          {!isHidden('education') && resume.education && resume.education.length > 0 && (
             <div>
               <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-3 flex items-center gap-1.5">
                 <GraduationCap className="w-3.5 h-3.5" /> Education
@@ -140,7 +143,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
           )}
 
           {/* Languages in Sidebar */}
-          {resume.languages && resume.languages.length > 0 && (
+          {!isHidden('languages') && resume.languages && resume.languages.length > 0 && (
             <div>
               <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-2 flex items-center gap-1.5">
                 <Languages className="w-3.5 h-3.5" /> Languages
@@ -171,7 +174,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         </header>
 
         {/* Summary */}
-        {resume.summary && (
+        {!isHidden('summary') && resume.summary && (
           <section>
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"
@@ -184,7 +187,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Experience */}
-        {resume.experience && resume.experience.length > 0 && (
+        {!isHidden('experience') && resume.experience && resume.experience.length > 0 && (
           <section>
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-1.5"
@@ -216,7 +219,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Projects */}
-        {resume.projects && resume.projects.length > 0 && (
+        {!isHidden('projects') && resume.projects && resume.projects.length > 0 && (
           <section>
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5"
@@ -252,7 +255,7 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
         )}
 
         {/* Certifications */}
-        {resume.certifications && resume.certifications.length > 0 && (
+        {!isHidden('certifications') && resume.certifications && resume.certifications.length > 0 && (
           <section>
             <h2
               className="text-xs font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5"
