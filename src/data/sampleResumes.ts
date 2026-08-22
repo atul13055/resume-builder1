@@ -1,0 +1,377 @@
+import { ResumeData, ThemeConfig } from '../types/resume';
+
+export const DEFAULT_THEME: ThemeConfig = {
+  template: 'modern',
+  primaryColor: '#0f172a', // Slate 900
+  accentColor: '#2563eb', // Blue 600
+  fontPairing: 'sans',
+  fontSize: 'md',
+  spacing: 'normal',
+  paperSize: 'letter',
+  showPhoto: false,
+  photoShape: 'circle',
+  showIcons: true,
+  sectionOrder: ['summary', 'experience', 'skills', 'projects', 'education', 'certifications', 'languages', 'custom'],
+  hiddenSections: [],
+};
+
+export const COLOR_PALETTES = [
+  { name: 'Executive Slate', primary: '#0f172a', accent: '#3b82f6', preview: '#0f172a' },
+  { name: 'Navy & Cyan', primary: '#0f2744', accent: '#0284c7', preview: '#0f2744' },
+  { name: 'Emerald Forest', primary: '#064e3b', accent: '#059669', preview: '#064e3b' },
+  { name: 'Burgundy Crimson', primary: '#4c0519', accent: '#e11d48', preview: '#4c0519' },
+  { name: 'Deep Indigo', primary: '#1e1b4b', accent: '#6366f1', preview: '#1e1b4b' },
+  { name: 'Charcoal Minimal', primary: '#18181b', accent: '#52525b', preview: '#27272a' },
+  { name: 'Teal Modern', primary: '#134e4a', accent: '#0d9488', preview: '#134e4a' },
+  { name: 'Warm Bronze', primary: '#451a03', accent: '#d97706', preview: '#451a03' },
+];
+
+export const SAMPLE_RESUMES: Record<string, { label: string; role: string; data: ResumeData; recommendedTheme: Partial<ThemeConfig> }> = {
+  softwareEngineer: {
+    label: 'Senior Full-Stack Engineer',
+    role: 'Technology & Software',
+    recommendedTheme: {
+      template: 'modern',
+      primaryColor: '#0f172a',
+      accentColor: '#2563eb',
+      fontPairing: 'sans',
+    },
+    data: {
+      id: 'sample-swe-1',
+      title: 'Senior Full-Stack Engineer Resume',
+      updatedAt: new Date().toISOString(),
+      personalInfo: {
+        fullName: 'Alexander Wright',
+        title: 'Senior Full-Stack Software Engineer',
+        email: 'alex.wright@email.com',
+        phone: '+1 (555) 234-8901',
+        location: 'San Francisco, CA',
+        website: 'alexwright.dev',
+        linkedin: 'linkedin.com/in/alexwright-dev',
+        github: 'github.com/alexwright',
+      },
+      summary:
+        'Results-driven Senior Full-Stack Engineer with 7+ years of experience architecting distributed cloud systems and high-throughput web applications. Proven track record of reducing latency by 42% and scaling platforms to 3.5M+ active users. Passionate about TypeScript, React, Node.js microservices, and automated CI/CD pipelines.',
+      experience: [
+        {
+          id: 'exp-1',
+          company: 'Stripe',
+          role: 'Senior Staff Software Engineer',
+          location: 'San Francisco, CA',
+          startDate: '2022-03',
+          endDate: 'Present',
+          current: true,
+          bullets: [
+            'Architected and led the migration of core payment settlement pipeline to an event-driven Go and Kafka architecture, reducing transaction processing latency by 38% for 4.2M daily transactions.',
+            'Spearheaded the redesign of the Merchant Analytics Portal using React 18, Next.js, and TypeScript, boosting customer dashboard engagement by 55% and reducing p99 load times to <450ms.',
+            'Mentored 8 mid-level engineers, instituted automated end-to-end testing with Playwright, and raised test coverage across critical billing modules from 68% to 94%.',
+            'Collaborated directly with Security & Compliance teams to achieve SOC2 Type II and PCI-DSS compliance zero-defect audits.',
+          ],
+        },
+        {
+          id: 'exp-2',
+          company: 'Datadog',
+          role: 'Full-Stack Software Engineer',
+          location: 'New York, NY',
+          startDate: '2019-06',
+          endDate: '2022-02',
+          current: false,
+          bullets: [
+            'Engineered real-time observability dashboards using React, WebSockets, and D3.js, rendering 100k+ time-series metrics with zero UI jank.',
+            'Optimized PostgreSQL query indexes and Redis caching layers, eliminating query bottlenecks and saving $140,000 in annual AWS infrastructure spend.',
+            'Built reusable internal component library adopted across 14 engineering pods, cutting frontend feature delivery cycles by 3 weeks.',
+          ],
+        },
+        {
+          id: 'exp-3',
+          company: 'Cloudflare',
+          role: 'Software Engineer',
+          location: 'Austin, TX',
+          startDate: '2017-08',
+          endDate: '2019-05',
+          current: false,
+          bullets: [
+            'Developed edge worker caching algorithms in Rust and TypeScript, improving cache-hit ratios from 82% to 96% across distributed edge points.',
+            'Integrated OAuth2 authentication flows with granular role-based access control (RBAC) supporting 250+ enterprise clients.',
+          ],
+        },
+      ],
+      education: [
+        {
+          id: 'edu-1',
+          school: 'University of California, Berkeley',
+          degree: 'Bachelor of Science',
+          field: 'Computer Science & Engineering',
+          location: 'Berkeley, CA',
+          startDate: '2013-09',
+          endDate: '2017-05',
+          gpa: '3.88 / 4.0',
+          bullets: [
+            'Dean’s Honors List (6 semesters); Eta Kappa Nu EECS Honor Society.',
+            'Coursework: Distributed Systems, Advanced Algorithms, Database Architecture, Machine Learning.',
+          ],
+        },
+      ],
+      skills: [
+        { id: 's-1', name: 'TypeScript / JavaScript', category: 'Technical', level: 'Expert' },
+        { id: 's-2', name: 'React / Next.js', category: 'Technical', level: 'Expert' },
+        { id: 's-3', name: 'Node.js / Express', category: 'Technical', level: 'Expert' },
+        { id: 's-4', name: 'Go / Golang', category: 'Technical', level: 'Advanced' },
+        { id: 's-5', name: 'PostgreSQL & Redis', category: 'Technical', level: 'Advanced' },
+        { id: 's-6', name: 'Docker & Kubernetes', category: 'Tools & Platforms', level: 'Advanced' },
+        { id: 's-7', name: 'AWS (ECS, Lambda, S3)', category: 'Tools & Platforms', level: 'Advanced' },
+        { id: 's-8', name: 'GraphQL & REST APIs', category: 'Technical', level: 'Expert' },
+        { id: 's-9', name: 'System Architecture', category: 'Soft Skills', level: 'Expert' },
+        { id: 's-10', name: 'Cross-functional Leadership', category: 'Soft Skills', level: 'Expert' },
+      ],
+      projects: [
+        {
+          id: 'proj-1',
+          name: 'HyperScale Queue Engine',
+          role: 'Creator & Maintainer',
+          link: 'https://github.com/alexwright/hyperscale-queue',
+          startDate: '2023-01',
+          endDate: '2023-08',
+          techStack: ['Go', 'Redis', 'gRPC', 'Docker'],
+          bullets: [
+            'Built an open-source distributed job queue processing 50,000+ ops/sec with sub-millisecond dispatching; earned 1,800+ GitHub stars.',
+            'Implemented Raft consensus algorithm for automated leader election and zero-data-loss failover.',
+          ],
+        },
+        {
+          id: 'proj-2',
+          name: 'Real-time Collaborative Canvas',
+          role: 'Lead Architect',
+          link: 'https://canvas-demo.dev',
+          startDate: '2022-04',
+          endDate: '2022-09',
+          techStack: ['React', 'WebSockets', 'CRDTs', 'TailwindCSS'],
+          bullets: [
+            'Developed multi-user vector canvas with conflict-free replicated data types (Yjs) supporting 50 concurrent editors with zero conflict lag.',
+          ],
+        },
+      ],
+      certifications: [
+        {
+          id: 'cert-1',
+          name: 'AWS Certified Solutions Architect – Professional',
+          issuer: 'Amazon Web Services',
+          issueDate: '2023-04',
+          expiryDate: '2026-04',
+          credentialId: 'AWS-PSA-99412',
+        },
+      ],
+      languages: [
+        { id: 'lang-1', language: 'English', proficiency: 'Native' },
+        { id: 'lang-2', language: 'Spanish', proficiency: 'Proficient' },
+      ],
+      customSections: [],
+    },
+  },
+
+  productManager: {
+    label: 'Lead Product Manager',
+    role: 'Product Management',
+    recommendedTheme: {
+      template: 'creative',
+      primaryColor: '#1e1b4b',
+      accentColor: '#6366f1',
+      fontPairing: 'sans',
+    },
+    data: {
+      id: 'sample-pm-1',
+      title: 'Lead Product Manager Resume',
+      updatedAt: new Date().toISOString(),
+      personalInfo: {
+        fullName: 'Elena Rostova',
+        title: 'Lead Product Manager | B2B SaaS & Growth',
+        email: 'elena.rostova@pmlead.io',
+        phone: '+1 (555) 432-9081',
+        location: 'Seattle, WA',
+        website: 'elenarostova.com',
+        linkedin: 'linkedin.com/in/elena-rostova-pm',
+        github: '',
+      },
+      summary:
+        'Strategic Lead Product Manager with 8+ years guiding 0-to-1 product launches and high-growth B2B enterprise SaaS features. Generated $18M+ in net-new ARR by executing data-driven roadmaps, customer discovery interviews, and PLG experimentation. Expert in cross-functional alignment between engineering, design, and executive leadership.',
+      experience: [
+        {
+          id: 'pm-exp-1',
+          company: 'Shopify',
+          role: 'Lead Product Manager – Merchant Growth',
+          location: 'Seattle, WA',
+          startDate: '2021-04',
+          endDate: 'Present',
+          current: true,
+          bullets: [
+            'Defined 3-year product vision and led 18-member cross-functional squad (engineers, designers, data scientists) to launch AI-driven upsell suite.',
+            'Scaled product adoption to 85,000+ active enterprise merchants, generating $14.2M incremental ARR in year one (140% of KPI goal).',
+            'Implemented A/B testing framework running 35+ concurrent product experiments, lifting customer conversion rates by 22.4%.',
+            'Presented quarterly roadmap milestones directly to C-Suite leadership and negotiated strategic integrations with key partner ecosystems.',
+          ],
+        },
+        {
+          id: 'pm-exp-2',
+          company: 'Zendesk',
+          role: 'Senior Product Manager',
+          location: 'San Francisco, CA',
+          startDate: '2018-01',
+          endDate: '2021-03',
+          current: false,
+          bullets: [
+            'Owned the Enterprise Workflow Automation product line, managing $32M portfolio ARR and growing NPS from +34 to +58.',
+            'Conducted 120+ user research sessions and customer advisory boards to identify critical churn drivers, decreasing annual churn by 3.8%.',
+            'Authored detailed PRDs, user stories, and acceptance criteria in Jira; decreased sprint spillover rate from 28% to under 6%.',
+          ],
+        },
+      ],
+      education: [
+        {
+          id: 'pm-edu-1',
+          school: 'University of Washington – Foster School of Business',
+          degree: 'Master of Business Administration (MBA)',
+          field: 'Technology Management & Strategy',
+          location: 'Seattle, WA',
+          startDate: '2016-09',
+          endDate: '2018-06',
+          gpa: '3.92 / 4.0',
+          bullets: ['President of Product Management Club; Winner of Tech Innovation Venture Competition.'],
+        },
+      ],
+      skills: [
+        { id: 'pm-s-1', name: 'Product Strategy & Roadmapping', category: 'Technical', level: 'Expert' },
+        { id: 'pm-s-2', name: 'Product-Led Growth (PLG)', category: 'Technical', level: 'Expert' },
+        { id: 'pm-s-3', name: 'A/B Testing & Mixpanel/Amplitude', category: 'Tools & Platforms', level: 'Expert' },
+        { id: 'pm-s-4', name: 'SQL & Data Analysis', category: 'Technical', level: 'Advanced' },
+        { id: 'pm-s-5', name: 'User Research & Discovery', category: 'Soft Skills', level: 'Expert' },
+        { id: 'pm-s-6', name: 'Agile / Scrum Sprint Leadership', category: 'Technical', level: 'Expert' },
+        { id: 'pm-s-7', name: 'Stakeholder Management', category: 'Soft Skills', level: 'Expert' },
+      ],
+      projects: [
+        {
+          id: 'pm-proj-1',
+          name: 'PLG Playbook for Enterprise SaaS',
+          role: 'Author & Keynote Speaker',
+          link: 'https://plgplaybook.substack.com',
+          startDate: '2023-02',
+          endDate: 'Present',
+          techStack: ['Product Strategy', 'Growth Marketing', 'Data Analytics'],
+          bullets: [
+            'Published in-depth product frameworks read by 12,000+ PM subscribers and cited on Product School podcasts.',
+          ],
+        },
+      ],
+      certifications: [
+        {
+          id: 'pm-cert-1',
+          name: 'Certified Scrum Product Owner (CSPO)',
+          issuer: 'Scrum Alliance',
+          issueDate: '2019-05',
+        },
+      ],
+      languages: [
+        { id: 'pm-l1', language: 'English', proficiency: 'Native' },
+        { id: 'pm-l2', language: 'Russian', proficiency: 'Native' },
+        { id: 'pm-l3', language: 'French', proficiency: 'Working' },
+      ],
+      customSections: [],
+    },
+  },
+
+  marketingLead: {
+    label: 'Growth Marketing Director',
+    role: 'Marketing & Growth',
+    recommendedTheme: {
+      template: 'compact',
+      primaryColor: '#064e3b',
+      accentColor: '#059669',
+      fontPairing: 'sans',
+    },
+    data: {
+      id: 'sample-mkt-1',
+      title: 'Growth Marketing Director Resume',
+      updatedAt: new Date().toISOString(),
+      personalInfo: {
+        fullName: 'Marcus Vance',
+        title: 'Director of Growth & Performance Marketing',
+        email: 'marcus.vance@growthhq.co',
+        phone: '+1 (555) 789-1234',
+        location: 'Chicago, IL',
+        website: 'marcusvance.marketing',
+        linkedin: 'linkedin.com/in/marcus-vance-growth',
+        github: '',
+      },
+      summary:
+        'Performance marketing leader with 9+ years managing $12M+ annual acquisition budgets across Paid Search, Paid Social, SEO, and Lifecycle automation. Generated 320,000+ qualified leads and decreased customer acquisition cost (CAC) by 34% while scaling blended ROAS to 4.2x.',
+      experience: [
+        {
+          id: 'mkt-exp-1',
+          company: 'Acme SaaS Corp',
+          role: 'Director of Performance Marketing',
+          location: 'Chicago, IL',
+          startDate: '2021-08',
+          endDate: 'Present',
+          current: true,
+          bullets: [
+            'Oversee $1.1M monthly ad spend across Google Ads, Meta, LinkedIn, and programmatic channels, generating 48,000 annual demo requests.',
+            'Engineered multi-touch attribution model in Snowflake/Looker, uncovering top converting touchpoints and slashing blended CAC from $480 to $315.',
+            'Scaled high-intent SEO content engine from 120k to 890k monthly organic visitors, yielding $4.8M in pipeline revenue.',
+            'Direct a team of 9 specialists (performance managers, copywriters, creative designers, and marketing engineers).',
+          ],
+        },
+      ],
+      education: [
+        {
+          id: 'mkt-edu-1',
+          school: 'Northwestern University',
+          degree: 'Bachelor of Arts',
+          field: 'Economics & Integrated Marketing Communications',
+          location: 'Evanston, IL',
+          startDate: '2012-09',
+          endDate: '2016-06',
+          gpa: '3.75 / 4.0',
+          bullets: ['Graduated Magna Cum Laude; Northwestern Marketing Association VP.'],
+        },
+      ],
+      skills: [
+        { id: 'mkt-s1', name: 'Google Ads & Search Marketing', category: 'Technical', level: 'Expert' },
+        { id: 'mkt-s2', name: 'Paid Social (Meta, LinkedIn, TikTok)', category: 'Technical', level: 'Expert' },
+        { id: 'mkt-s3', name: 'Multi-touch Attribution & Looker', category: 'Tools & Platforms', level: 'Expert' },
+        { id: 'mkt-s4', name: 'Conversion Rate Optimization (CRO)', category: 'Technical', level: 'Expert' },
+        { id: 'mkt-s5', name: 'HubSpot & Marketo Lifecycle', category: 'Tools & Platforms', level: 'Advanced' },
+        { id: 'mkt-s6', name: 'Budget Allocation & CAC/LTV Modeling', category: 'Soft Skills', level: 'Expert' },
+      ],
+      projects: [],
+      certifications: [
+        { id: 'mkt-c1', name: 'Google Ads Search & Measurement Certified', issuer: 'Google', issueDate: '2023-01' },
+      ],
+      languages: [{ id: 'mkt-l1', language: 'English', proficiency: 'Native' }],
+      customSections: [],
+    },
+  },
+};
+
+export const EMPTY_RESUME: ResumeData = {
+  id: 'empty-resume',
+  title: 'Untitled Resume',
+  updatedAt: new Date().toISOString(),
+  personalInfo: {
+    fullName: '',
+    title: '',
+    email: '',
+    phone: '',
+    location: '',
+    website: '',
+    linkedin: '',
+    github: '',
+  },
+  summary: '',
+  experience: [],
+  education: [],
+  skills: [],
+  projects: [],
+  certifications: [],
+  languages: [],
+  customSections: [],
+};
+

@@ -1,0 +1,6 @@
+{
+  "name": "ResumeBuilder",
+  "description": "Professional resume builder with customizable templates, real-time preview, ATS compatibility scoring, AI tailoring assistant, and PDF/DOCX export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
