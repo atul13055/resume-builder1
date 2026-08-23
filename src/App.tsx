@@ -208,38 +208,18 @@ export default function App() {
       {currentView === 'home' ? (
         <div className="flex-1 overflow-y-auto">
           <HomePage
-            onLaunchBuilder={() => {
-              requireAuth(
-                () => setCurrentView('builder'),
-                'Please sign in or create an account to start building and saving your resume.'
-              );
-            }}
+            onLaunchBuilder={() => setCurrentView('builder')}
             onSelectTemplate={(tpl) => {
-              requireAuth(() => {
-                handleSelectTemplate(tpl);
-                setCurrentView('builder');
-              }, 'Please sign in or create an account to customize this template.');
+              handleSelectTemplate(tpl);
+              setCurrentView('builder');
             }}
             onLoadSample={(sampleKey) => {
-              requireAuth(() => {
-                handleLoadSample(sampleKey);
-                setCurrentView('builder');
-              }, 'Please sign in or create an account to load and edit sample resumes.');
+              handleLoadSample(sampleKey);
+              setCurrentView('builder');
             }}
-            onOpenLinkedInModal={() => {
-              requireAuth(
-                () => setIsLinkedInModalOpen(true),
-                'Please sign in to import and parse your LinkedIn profile.'
-              );
-            }}
-            onOpenAuthModal={() => handleOpenAuth('signin')}
-            onOpenCloudResumesModal={() => {
-              if (user) {
-                setIsCloudResumesModalOpen(true);
-              } else {
-                handleOpenAuth('signin');
-              }
-            }}
+            onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+            onOpenAuthModal={() => {}}
+            onOpenCloudResumesModal={() => setIsCloudResumesModalOpen(true)}
           />
         </div>
       ) : (
