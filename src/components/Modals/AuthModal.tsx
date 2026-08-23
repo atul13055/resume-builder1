@@ -60,6 +60,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   }, [isOpen, initialMode]);
 
+  const getCleanErrorMessage = (err: any, fallback: string) => {
+    const raw = err?.message || err?.code || '';
+    if (raw.includes('unauthorized-domain') || err?.code === 'auth/unauthorized-domain') {
+      return 'Unauthorized Domain: Please add "resume-builder-nu-dun.vercel.app" (or your custom domain) to Firebase Console > Authentication > Settings > Authorized domains.';
+    }
+    if (raw.includes('popup-blocked') || err?.code === 'auth/popup-blocked') {
+      return 'Sign-in popup was blocked by your browser. Please allow popups for this site.';
+    }
+    return err?.message || fallback;
+  };
+
   const handleGoogleAuth = async () => {
     setLocalError(null);
     setIsLoading(true);
@@ -71,7 +82,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       onClose();
     } catch (err: any) {
       if (err?.code !== 'auth/popup-closed-by-user') {
-        setLocalError(err?.message || 'Google sign in failed');
+        setLocalError(getCleanErrorMessage(err, 'Google sign in failed'));
       }
     } finally {
       setIsLoading(false);
@@ -94,7 +105,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         await sendPasswordReset(email);
         setResetSent(true);
       } catch (err: any) {
-        setLocalError(err?.message || 'Failed to send reset link.');
+        setLocalError(getCleanErrorMessage(err, 'Failed to send reset link.'));
       } finally {
         setIsLoading(false);
       }
@@ -124,7 +135,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }
         onClose();
       } catch (err: any) {
-        setLocalError(err?.message || 'Failed to create account.');
+        setLocalError(getCleanErrorMessage(err, 'Failed to create account.'));
       } finally {
         setIsLoading(false);
       }
@@ -137,7 +148,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         }
         onClose();
       } catch (err: any) {
-        setLocalError(err?.message || 'Failed to sign in.');
+        setLocalError(getCleanErrorMessage(err, 'Failed to sign in.'));
       } finally {
         setIsLoading(false);
       }

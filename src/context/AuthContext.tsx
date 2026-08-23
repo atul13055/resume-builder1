@@ -72,6 +72,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const clearError = () => setError(null);
 
+  const formatAuthError = (err: any, fallback: string) => {
+    if (err?.code === 'auth/unauthorized-domain') {
+      return 'Unauthorized Domain: Please add your domain (e.g. resume-builder-nu-dun.vercel.app or vercel.app) to Firebase Console > Authentication > Settings > Authorized domains.';
+    }
+    if (err?.code === 'auth/popup-blocked') {
+      return 'Sign-in popup was blocked by your browser. Please allow popups for this site.';
+    }
+    if (err?.code === 'auth/network-request-failed') {
+      return 'Network error: Please check your internet connection.';
+    }
+    return err?.message || fallback;
+  };
+
   const signInWithGoogle = async () => {
     setError(null);
     try {
@@ -82,8 +95,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // User closed popup, don't show error
         return;
       }
-      setError(err?.message || 'Failed to sign in with Google');
-      throw err;
+      const msg = formatAuthError(err, 'Failed to sign in with Google');
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -94,7 +108,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       console.error('Email Sign In Error:', err);
       let msg = 'Failed to sign in. Please check your email and password.';
-      if (err?.code === 'auth/user-not-found' || err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
+      if (err?.code === 'auth/unauthorized-domain') {
+        msg = 'Unauthorized Domain: Add this domain to Firebase Console > Authentication > Settings > Authorized domains.';
+      } else if (err?.code === 'auth/user-not-found' || err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential') {
         msg = 'Invalid email or password.';
       } else if (err?.code === 'auth/invalid-email') {
         msg = 'Please enter a valid email address.';
@@ -116,7 +132,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       console.error('Sign Up Error:', err);
       let msg = 'Failed to create account.';
-      if (err?.code === 'auth/email-already-in-use') {
+      if (err?.code === 'auth/unauthorized-domain') {
+        msg = 'Unauthorized Domain: Add this domain to Firebase Console > Authentication > Settings > Authorized domains.';
+      } else if (err?.code === 'auth/email-already-in-use') {
         msg = 'An account with this email already exists. Please log in.';
       } else if (err?.code === 'auth/weak-password') {
         msg = 'Password should be at least 6 characters.';
@@ -135,7 +153,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       console.error('Password Reset Error:', err);
       let msg = 'Failed to send password reset email.';
-      if (err?.code === 'auth/user-not-found') {
+      if (err?.code === 'auth/unauthorized-domain') {
+        msg = 'Unauthorized Domain: Add this domain to Firebase Console > Authentication > Settings > Authorized domains.';
+      } else if (err?.code === 'auth/user-not-found') {
         msg = 'No user found with this email address.';
       } else if (err?.code === 'auth/invalid-email') {
         msg = 'Please enter a valid email address.';
