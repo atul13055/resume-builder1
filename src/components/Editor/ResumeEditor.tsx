@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ResumeData, ThemeConfig } from '../../types/resume';
 import { PersonalInfoForm } from './PersonalInfoForm';
 import { SummaryForm } from './SummaryForm';
@@ -232,72 +233,83 @@ export const ResumeEditor: React.FC<ResumeEditorProps> = ({
       )}
 
       {/* Main Tab Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
-        {activeTab === 'personal' && (
-          <PersonalInfoForm
-            data={resume.personalInfo}
-            onChange={(personalInfo) => onChange({ ...resume, personalInfo })}
-            onOpenLinkedInModal={onOpenLinkedInModal}
-          />
-        )}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            className="space-y-6"
+          >
+            {activeTab === 'personal' && (
+              <PersonalInfoForm
+                data={resume.personalInfo}
+                onChange={(personalInfo) => onChange({ ...resume, personalInfo })}
+                onOpenLinkedInModal={onOpenLinkedInModal}
+              />
+            )}
 
-        {activeTab === 'summary' && (
-          <SummaryForm
-            summary={resume.summary}
-            resumeData={resume}
-            onChange={(summary) => onChange({ ...resume, summary })}
-          />
-        )}
+            {activeTab === 'summary' && (
+              <SummaryForm
+                summary={resume.summary}
+                resumeData={resume}
+                onChange={(summary) => onChange({ ...resume, summary })}
+              />
+            )}
 
-        {activeTab === 'experience' && (
-          <ExperienceForm
-            experience={resume.experience}
-            onChange={(experience) => onChange({ ...resume, experience })}
-          />
-        )}
+            {activeTab === 'experience' && (
+              <ExperienceForm
+                experience={resume.experience}
+                onChange={(experience) => onChange({ ...resume, experience })}
+              />
+            )}
 
-        {activeTab === 'skills' && (
-          <SkillsForm
-            skills={resume.skills}
-            onChange={(skills) => onChange({ ...resume, skills })}
-            userTitle={resume.personalInfo?.title}
-            experienceRoles={resume.experience?.map((e) => e.role) || []}
-          />
-        )}
+            {activeTab === 'skills' && (
+              <SkillsForm
+                skills={resume.skills}
+                onChange={(skills) => onChange({ ...resume, skills })}
+                userTitle={resume.personalInfo?.title}
+                experienceRoles={resume.experience?.map((e) => e.role) || []}
+              />
+            )}
 
-        {activeTab === 'education' && (
-          <EducationForm
-            education={resume.education}
-            onChange={(education) => onChange({ ...resume, education })}
-          />
-        )}
+            {activeTab === 'education' && (
+              <EducationForm
+                education={resume.education}
+                onChange={(education) => onChange({ ...resume, education })}
+              />
+            )}
 
-        {activeTab === 'projects' && (
-          <ProjectsForm
-            projects={resume.projects}
-            onChange={(projects) => onChange({ ...resume, projects })}
-          />
-        )}
+            {activeTab === 'projects' && (
+              <ProjectsForm
+                projects={resume.projects}
+                onChange={(projects) => onChange({ ...resume, projects })}
+              />
+            )}
 
-        {activeTab === 'certifications' && (
-          <CertificationsForm
-            certifications={resume.certifications}
-            languages={resume.languages}
-            onCertificationsChange={(certifications) => onChange({ ...resume, certifications })}
-            onLanguagesChange={(languages) => onChange({ ...resume, languages })}
-          />
-        )}
+            {activeTab === 'certifications' && (
+              <CertificationsForm
+                certifications={resume.certifications}
+                languages={resume.languages}
+                onCertificationsChange={(certifications) => onChange({ ...resume, certifications })}
+                onLanguagesChange={(languages) => onChange({ ...resume, languages })}
+              />
+            )}
 
-        {activeTab === 'sections' && onChangeTheme && (
-          <div className="space-y-4">
-            <SectionOrderManager
-              resume={resume}
-              theme={theme}
-              onChangeTheme={onChangeTheme}
-              onNavigateToTab={(tabKey) => setActiveTab(tabKey)}
-            />
-          </div>
-        )}
+            {activeTab === 'sections' && onChangeTheme && (
+              <div className="space-y-4">
+                <SectionOrderManager
+                  resume={resume}
+                  theme={theme}
+                  onChangeTheme={onChangeTheme}
+                  onNavigateToTab={(tabKey) => setActiveTab(tabKey)}
+                />
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

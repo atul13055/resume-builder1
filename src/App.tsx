@@ -3,7 +3,9 @@ import { ResumeData, ThemeConfig, ResumeTemplateType } from './types/resume';
 import { SAMPLE_RESUMES, DEFAULT_THEME, EMPTY_RESUME } from './data/sampleResumes';
 import { calculateATSScore } from './utils/atsScorer';
 import { useResumeHistory } from './hooks/useResumeHistory';
+import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
+import { HomePage } from './components/Home/HomePage';
 import { ResumeEditor } from './components/Editor/ResumeEditor';
 import { ResumePreview } from './components/Preview/ResumePreview';
 import { ATSScoreModal } from './components/Modals/ATSScoreModal';
@@ -13,12 +15,20 @@ import { TemplatePickerModal } from './components/Modals/TemplatePickerModal';
 import { CustomizationDrawer } from './components/Modals/CustomizationDrawer';
 import { ExportModal } from './components/Modals/ExportModal';
 import { LinkedInImportModal } from './components/Modals/LinkedInImportModal';
+import { AuthModal } from './components/Modals/AuthModal';
+import { CloudResumesModal } from './components/Modals/CloudResumesModal';
 import { Edit3, Eye, Sparkles, CheckCircle2 } from 'lucide-react';
 
 const STORAGE_KEY_RESUME = 'resumebuilder_saved_resume_v1';
 const STORAGE_KEY_THEME = 'resumebuilder_saved_theme_v1';
+const STORAGE_KEY_VIEW = 'resumebuilder_active_view_v1';
 
 export default function App() {
+  const { user } = useAuth();
+
+  // Current view: 'home' | 'builder'
+  const [currentView, setCurrentView] = useState<'home' | 'builder'>('home');
+
   // Compute initial resume from localStorage or default to Software Engineer sample
   const initialResume = useMemo<ResumeData>(() => {
     try {
@@ -51,6 +61,9 @@ export default function App() {
     maxHistory,
   } = useResumeHistory(initialResume);
 
+  // Active Cloud document ID (if loaded from Firestore)
+  const [activeCloudResumeId, setActiveCloudResumeId] = useState<string | null>(null);
+
   // Initialize theme
   const [theme, setTheme] = useState<ThemeConfig>(() => {
     try {
@@ -78,6 +91,23 @@ export default function App() {
   const [isCustomizationOpen, setIsCustomizationOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isLinkedInModalOpen, setIsLinkedInModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signin');
+  const [authModalCustomMessage, setAuthModalCustomMessage] = useState<string | undefined>(undefined);
+  const [pendingAuthAction, setPendingAuthAction] = useState<(() => void) | null>(null);
+  const [isCloudResumesModalOpen, setIsCloudResumesModalOpen] = useState(false);
+
+  // Helper to require authentication before proceeding with builder or actions
+  const requireAuth = (action: () => void, customMessage?: string) => {
+    if (user) {
+      action();
+    } else {
+      setPendingAuthAction(() => action);
+      setAuthModalMode('signin');
+      setAuthModalCustomMessage(customMessage || 'Please sign in or create an account to start building and saving your resume.');
+      setIsAuthModalOpen(true);
+    }
+  };
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -110,6 +140,7 @@ export default function App() {
     const chosen = SAMPLE_RESUMES[sampleKey];
     if (chosen?.data) {
       setResume(chosen.data, { immediate: true });
+      setActiveCloudResumeId(null);
       if (chosen.recommendedTheme) {
         setTheme((prev) => ({
           ...prev,
@@ -122,6 +153,7 @@ export default function App() {
   const handleReset = () => {
     if (window.confirm('Are you sure you want to clear all fields and start with a blank resume?')) {
       setResume(EMPTY_RESUME, { immediate: true });
+      setActiveCloudResumeId(null);
     }
   };
 
@@ -132,6 +164,7 @@ export default function App() {
   const handleApplyLinkedInResume = (importedResume: ResumeData, mode: 'replace' | 'merge') => {
     if (mode === 'replace') {
       setResume(importedResume, { immediate: true });
+      setActiveCloudResumeId(null);
     } else {
       // Merge with existing resume
       setResume((prev) => ({
@@ -151,111 +184,200 @@ export default function App() {
     }
   };
 
+  const handleLoadCloudResume = (loadedResume: ResumeData, loadedTheme?: ThemeConfig, cloudId?: string) => {
+    setResume(loadedResume, { immediate: true });
+    if (loadedTheme) {
+      setTheme(loadedTheme);
+    }
+    if (cloudId) {
+      setActiveCloudResumeId(cloudId);
+    }
+  };
+
   const handleSelectTemplate = (template: ResumeTemplateType) => {
     setTheme((prev) => ({ ...prev, template }));
   };
 
+  const handleOpenAuth = (mode: 'signin' | 'signup' = 'signin') => {
+    setAuthModalMode(mode);
+    setIsAuthModalOpen(true);
+  };
+
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-900 font-sans text-slate-800">
-      {/* Top Navbar with Undo/Redo */}
-      <Navbar
-        resume={resume}
-        theme={theme}
-        atsScore={atsAnalysis.overallScore}
-        canUndo={canUndo}
-        canRedo={canRedo}
-        undoCount={undoCount}
-        redoCount={redoCount}
-        maxHistory={maxHistory}
-        onUndo={undo}
-        onRedo={redo}
-        onOpenAtsModal={() => setIsAtsModalOpen(true)}
-        onOpenTailorModal={() => setIsTailorModalOpen(true)}
-        onOpenCoverLetterModal={() => setIsCoverLetterModalOpen(true)}
-        onOpenTemplateModal={() => setIsTemplateModalOpen(true)}
-        onOpenCustomization={() => setIsCustomizationOpen(true)}
-        onOpenExportModal={() => setIsExportModalOpen(true)}
-        onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
-        onLoadSample={handleLoadSample}
-        onReset={handleReset}
-      />
-
-      {/* Mobile Tab Switcher (<lg screens) */}
-      <div className="lg:hidden bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center justify-center gap-3">
-        <button
-          onClick={() => setMobileTab('editor')}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            mobileTab === 'editor'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-          }`}
-        >
-          <Edit3 className="w-3.5 h-3.5" />
-          <span>Editor Form</span>
-        </button>
-
-        <button
-          onClick={() => setMobileTab('preview')}
-          className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-            mobileTab === 'preview'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-          }`}
-        >
-          <Eye className="w-3.5 h-3.5" />
-          <span>Live Preview</span>
-          <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500 text-white rounded-full font-bold">
-            {atsAnalysis.overallScore}%
-          </span>
-        </button>
-      </div>
-
-      {/* Main Split-Screen Workspace */}
-      <div className="flex-1 flex overflow-hidden bg-slate-100">
-        {/* Left Column: Rich Form Editor with Undo/Redo */}
-        <div
-          id="editor-container"
-          className={`w-full lg:w-[48%] xl:w-[45%] h-full overflow-hidden border-r border-slate-200 ${
-            mobileTab === 'editor' ? 'block' : 'hidden lg:block'
-          }`}
-        >
-          <ResumeEditor
-            resume={resume}
-            theme={theme}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            undoCount={undoCount}
-            maxHistory={maxHistory}
-            onUndo={undo}
-            onRedo={redo}
-            onChange={setResume}
-            onChangeTheme={setTheme}
-            onOpenTailorModal={() => setIsTailorModalOpen(true)}
-            onOpenAtsModal={() => setIsAtsModalOpen(true)}
-            onOpenCustomization={() => setIsCustomizationOpen(true)}
-            onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 font-sans text-slate-800">
+      {currentView === 'home' ? (
+        <div className="flex-1 overflow-y-auto">
+          <HomePage
+            onLaunchBuilder={() => {
+              requireAuth(
+                () => setCurrentView('builder'),
+                'Please sign in or create an account to start building and saving your resume.'
+              );
+            }}
+            onSelectTemplate={(tpl) => {
+              requireAuth(() => {
+                handleSelectTemplate(tpl);
+                setCurrentView('builder');
+              }, 'Please sign in or create an account to customize this template.');
+            }}
+            onLoadSample={(sampleKey) => {
+              requireAuth(() => {
+                handleLoadSample(sampleKey);
+                setCurrentView('builder');
+              }, 'Please sign in or create an account to load and edit sample resumes.');
+            }}
+            onOpenLinkedInModal={() => {
+              requireAuth(
+                () => setIsLinkedInModalOpen(true),
+                'Please sign in to import and parse your LinkedIn profile.'
+              );
+            }}
+            onOpenAuthModal={() => handleOpenAuth('signin')}
+            onOpenCloudResumesModal={() => {
+              if (user) {
+                setIsCloudResumesModalOpen(true);
+              } else {
+                handleOpenAuth('signin');
+              }
+            }}
           />
         </div>
-
-        {/* Right Column: Live Real-Time Interactive Canvas Preview */}
-        <div
-          id="resume-preview-container"
-          className={`flex-1 h-full overflow-hidden ${
-            mobileTab === 'preview' ? 'block' : 'hidden lg:block'
-          }`}
-        >
-          <ResumePreview
+      ) : (
+        <>
+          {/* Top Navbar with Undo/Redo & Home Navigation */}
+          <Navbar
             resume={resume}
             theme={theme}
             atsScore={atsAnalysis.overallScore}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            undoCount={undoCount}
+            redoCount={redoCount}
+            maxHistory={maxHistory}
+            activeCloudResumeId={activeCloudResumeId}
+            onUndo={undo}
+            onRedo={redo}
+            onGoHome={() => setCurrentView('home')}
             onOpenAtsModal={() => setIsAtsModalOpen(true)}
             onOpenTailorModal={() => setIsTailorModalOpen(true)}
-            onChangeTheme={setTheme}
+            onOpenCoverLetterModal={() => setIsCoverLetterModalOpen(true)}
+            onOpenTemplateModal={() => setIsTemplateModalOpen(true)}
+            onOpenCustomization={() => setIsCustomizationOpen(true)}
+            onOpenExportModal={() => setIsExportModalOpen(true)}
+            onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+            onOpenAuthModal={() => handleOpenAuth('signin')}
+            onOpenCloudResumesModal={() => setIsCloudResumesModalOpen(true)}
+            onLoadSample={handleLoadSample}
+            onReset={handleReset}
           />
-        </div>
-      </div>
+
+          {/* Mobile Tab Switcher (<lg screens) */}
+          <div className="lg:hidden bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center justify-center gap-3">
+            <button
+              onClick={() => setMobileTab('editor')}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                mobileTab === 'editor'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Editor Form</span>
+            </button>
+
+            <button
+              onClick={() => setMobileTab('preview')}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                mobileTab === 'preview'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              <span>Live Preview</span>
+              <span className="text-[10px] px-1.5 py-0.2 bg-emerald-500 text-white rounded-full font-bold">
+                {atsAnalysis.overallScore}%
+              </span>
+            </button>
+          </div>
+
+          {/* Main Split-Screen Workspace */}
+          <div className="flex-1 flex overflow-hidden bg-slate-100">
+            {/* Left Column: Rich Form Editor with Undo/Redo */}
+            <div
+              id="editor-container"
+              className={`w-full lg:w-[48%] xl:w-[45%] h-full overflow-hidden border-r border-slate-200 ${
+                mobileTab === 'editor' ? 'block' : 'hidden lg:block'
+              }`}
+            >
+              <ResumeEditor
+                resume={resume}
+                theme={theme}
+                canUndo={canUndo}
+                canRedo={canRedo}
+                undoCount={undoCount}
+                maxHistory={maxHistory}
+                onUndo={undo}
+                onRedo={redo}
+                onChange={setResume}
+                onChangeTheme={setTheme}
+                onOpenTailorModal={() => setIsTailorModalOpen(true)}
+                onOpenAtsModal={() => setIsAtsModalOpen(true)}
+                onOpenCustomization={() => setIsCustomizationOpen(true)}
+                onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+              />
+            </div>
+
+            {/* Right Column: Live Real-Time Interactive Canvas Preview */}
+            <div
+              id="resume-preview-container"
+              className={`flex-1 h-full overflow-hidden ${
+                mobileTab === 'preview' ? 'block' : 'hidden lg:block'
+              }`}
+            >
+              <ResumePreview
+                resume={resume}
+                theme={theme}
+                atsScore={atsAnalysis.overallScore}
+                onOpenAtsModal={() => setIsAtsModalOpen(true)}
+                onOpenTailorModal={() => setIsTailorModalOpen(true)}
+                onChangeTheme={setTheme}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Modals & Drawers */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => {
+          setIsAuthModalOpen(false);
+          setPendingAuthAction(null);
+          setAuthModalCustomMessage(undefined);
+        }}
+        initialMode={authModalMode}
+        customMessage={authModalCustomMessage}
+        onSuccess={() => {
+          if (pendingAuthAction) {
+            pendingAuthAction();
+            setPendingAuthAction(null);
+          }
+        }}
+      />
+
+      <CloudResumesModal
+        isOpen={isCloudResumesModalOpen}
+        onClose={() => setIsCloudResumesModalOpen(false)}
+        currentResume={resume}
+        currentTheme={theme}
+        currentAtsScore={atsAnalysis.overallScore}
+        activeCloudResumeId={activeCloudResumeId}
+        onLoadResume={handleLoadCloudResume}
+        onSetActiveCloudResumeId={setActiveCloudResumeId}
+        onOpenAuthModal={() => handleOpenAuth('signin')}
+      />
+
       <LinkedInImportModal
         isOpen={isLinkedInModalOpen}
         onClose={() => setIsLinkedInModalOpen(false)}
@@ -313,3 +435,4 @@ export default function App() {
     </div>
   );
 }
+

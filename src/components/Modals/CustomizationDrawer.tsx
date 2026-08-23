@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ThemeConfig, ResumeTemplateType, PaperSize } from '../../types/resume';
 import { COLOR_PALETTES } from '../../data/sampleResumes';
 import { PAGE_SIZE_LIST } from '../../data/pageSizeData';
@@ -19,8 +20,6 @@ export const CustomizationDrawer: React.FC<CustomizationDrawerProps> = ({
   onChangeTheme,
   onOpenTemplateModal,
 }) => {
-  if (!isOpen) return null;
-
   const fontOptions: { id: ThemeConfig['fontPairing']; label: string; preview: string }[] = [
     { id: 'sans', label: 'Inter / Modern Sans', preview: 'Clean & Contemporary' },
     { id: 'serif', label: 'Merriweather / Classic Serif', preview: 'Traditional & Formal' },
@@ -28,8 +27,30 @@ export const CustomizationDrawer: React.FC<CustomizationDrawerProps> = ({
   ];
 
   return (
-    <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl border-l border-slate-200 flex flex-col animate-in slide-in-from-right duration-200">
-      {/* Drawer Header */}
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            key="customization-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-2xs"
+          />
+
+          {/* Drawer Panel */}
+          <motion.div
+            key="customization-panel"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl border-l border-slate-200 flex flex-col"
+          >
+            {/* Drawer Header */}
       <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
         <div className="flex items-center gap-2">
           <Sliders className="w-4 h-4 text-blue-600" />
@@ -318,6 +339,9 @@ export const CustomizationDrawer: React.FC<CustomizationDrawerProps> = ({
           Apply Styles & Close
         </button>
       </div>
-    </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };

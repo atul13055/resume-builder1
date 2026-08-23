@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useSpellCheck } from '../Editor/SpellCheckContext';
 import { BookOpen, Plus, Trash2, X, Check, Search, ShieldCheck } from 'lucide-react';
 
@@ -16,8 +17,6 @@ export const SpellCheckDictionaryModal: React.FC<SpellCheckDictionaryModalProps>
   const [searchFilter, setSearchFilter] = useState('');
   const [addedFeedback, setAddedFeedback] = useState(false);
 
-  if (!isOpen) return null;
-
   const handleAdd = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const clean = newWord.trim();
@@ -34,9 +33,28 @@ export const SpellCheckDictionaryModal: React.FC<SpellCheckDictionaryModalProps>
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]">
-        {/* Header */}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="dictionary-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs"
+        >
+          <motion.div
+            key="dictionary-modal-card"
+            initial={{ opacity: 0, scale: 0.95, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 350 }}
+            className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-md overflow-hidden flex flex-col max-h-[85vh]"
+          >
+            {/* Header */}
         <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
@@ -151,7 +169,9 @@ export const SpellCheckDictionaryModal: React.FC<SpellCheckDictionaryModalProps>
             Done
           </button>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

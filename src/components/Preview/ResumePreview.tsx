@@ -5,6 +5,12 @@ import { MinimalTemplate } from './templates/MinimalTemplate';
 import { CreativeTemplate } from './templates/CreativeTemplate';
 import { AcademicTemplate } from './templates/AcademicTemplate';
 import { CompactTemplate } from './templates/CompactTemplate';
+import { ExecutiveTemplate } from './templates/ExecutiveTemplate';
+import { TechTemplate } from './templates/TechTemplate';
+import { ElegantTemplate } from './templates/ElegantTemplate';
+import { NordicTemplate } from './templates/NordicTemplate';
+import { SplitTemplate } from './templates/SplitTemplate';
+import { InfographicTemplate } from './templates/InfographicTemplate';
 import {
   ZoomIn,
   ZoomOut,
@@ -101,6 +107,18 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         return <AcademicTemplate resume={resume} theme={theme} />;
       case 'compact':
         return <CompactTemplate resume={resume} theme={theme} />;
+      case 'executive':
+        return <ExecutiveTemplate resume={resume} theme={theme} />;
+      case 'tech':
+        return <TechTemplate resume={resume} theme={theme} />;
+      case 'elegant':
+        return <ElegantTemplate resume={resume} theme={theme} />;
+      case 'nordic':
+        return <NordicTemplate resume={resume} theme={theme} />;
+      case 'split':
+        return <SplitTemplate resume={resume} theme={theme} />;
+      case 'infographic':
+        return <InfographicTemplate resume={resume} theme={theme} />;
       case 'modern':
       default:
         return <ModernTemplate resume={resume} theme={theme} />;

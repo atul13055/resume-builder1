@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ResumeData, AITailorResult, ExperienceItem } from '../../types/resume';
 import {
   X,
@@ -36,8 +37,6 @@ export const AITailorModal: React.FC<AITailorModalProps> = ({
   const [applySummary, setApplySummary] = useState(true);
   const [applyBullets, setApplyBullets] = useState(true);
   const [applySkills, setApplySkills] = useState(true);
-
-  if (!isOpen) return null;
 
   const handleTailor = async () => {
     if (!jobDescription.trim()) {
@@ -125,9 +124,28 @@ export const AITailorModal: React.FC<AITailorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200">
-        {/* Modal Header */}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="tailor-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs"
+        >
+          <motion.div
+            key="tailor-modal-card"
+            initial={{ opacity: 0, scale: 0.95, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 350 }}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200"
+          >
+            {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-blue-50">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold shadow-xs">
@@ -335,7 +353,9 @@ export const AITailorModal: React.FC<AITailorModalProps> = ({
             </button>
           )}
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

@@ -1,4 +1,15 @@
-export type TemplateId = 'modern' | 'minimal' | 'creative' | 'academic' | 'compact';
+export type TemplateId =
+  | 'modern'
+  | 'minimal'
+  | 'creative'
+  | 'academic'
+  | 'compact'
+  | 'executive'
+  | 'tech'
+  | 'elegant'
+  | 'nordic'
+  | 'split'
+  | 'infographic';
 export type ResumeTemplateType = TemplateId;
 
 export type FontPairing = 'sans' | 'serif' | 'mono';

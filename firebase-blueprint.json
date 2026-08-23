@@ -1,0 +1,25 @@
+{
+  "entities": {
+    "UserProfile": {
+      "collection": "users",
+      "fields": {
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "lastLoginAt": { "type": "string" }
+      }
+    },
+    "SavedResume": {
+      "collection": "users/{userId}/resumes",
+      "fields": {
+        "title": { "type": "string" },
+        "resumeData": { "type": "object" },
+        "theme": { "type": "object" },
+        "atsScore": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      }
+    }
+  }
+}

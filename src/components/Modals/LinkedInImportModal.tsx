@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ResumeData } from '../../types/resume';
 import {
   Linkedin,
@@ -37,8 +38,6 @@ export const LinkedInImportModal: React.FC<LinkedInImportModalProps> = ({
   const [step, setStep] = useState<'input' | 'preview'>('input');
   const [parsedData, setParsedData] = useState<ResumeData | null>(null);
   const [importMode, setImportMode] = useState<'replace' | 'merge'>('replace');
-
-  if (!isOpen) return null;
 
   const handleStartImport = async () => {
     setError(null);
@@ -96,9 +95,28 @@ export const LinkedInImportModal: React.FC<LinkedInImportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        {/* Header */}
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="linkedin-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4"
+        >
+          <motion.div
+            key="linkedin-modal-card"
+            initial={{ opacity: 0, scale: 0.95, y: 14 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: 'spring', damping: 26, stiffness: 350 }}
+            className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden"
+          >
+            {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
@@ -443,7 +461,9 @@ export const LinkedInImportModal: React.FC<LinkedInImportModalProps> = ({
             </button>
           )}
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
