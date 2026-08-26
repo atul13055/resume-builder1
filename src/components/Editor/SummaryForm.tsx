@@ -3,6 +3,8 @@ import { ResumeData } from '../../types/resume';
 import { FileText, Sparkles, Loader2, Check, RefreshCw } from 'lucide-react';
 import { SpellCheckedTextarea } from './SpellCheckedTextarea';
 
+import { generateSummaryClientSide } from '../../utils/aiClientFallback';
+
 interface SummaryFormProps {
   summary: string;
   resumeData: ResumeData;
@@ -21,25 +23,31 @@ export const SummaryForm: React.FC<SummaryFormProps> = ({ summary, resumeData, o
     try {
       setIsGenerating(true);
       setError(null);
-      const res = await fetch('/api/ai/generate-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resumeData,
-          targetRole: resumeData.personalInfo.title,
-          tone: selectedTone,
-        }),
-      });
+      let data;
+      try {
+        const res = await fetch('/api/ai/generate-summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resumeData,
+            targetRole: resumeData.personalInfo.title,
+            tone: selectedTone,
+          }),
+        });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to generate summary.');
+        if (res.ok) {
+          data = await res.json();
+        } else {
+          // If serverless endpoint returned 404 or error, fallback to client-side Gemini AI
+          data = await generateSummaryClientSide(resumeData, resumeData.personalInfo.title, selectedTone);
+        }
+      } catch (fetchErr) {
+        data = await generateSummaryClientSide(resumeData, resumeData.personalInfo.title, selectedTone);
       }
 
-      const data = await res.json();
       setAiSuggestions(data);
     } catch (err: any) {
-      setError(err.message || 'AI Generation failed. Please ensure Gemini API key is configured.');
+      setError(err.message || 'AI Generation failed. Please configure GEMINI_API_KEY in Vercel project environment variables.');
     } finally {
       setIsGenerating(false);
     }
