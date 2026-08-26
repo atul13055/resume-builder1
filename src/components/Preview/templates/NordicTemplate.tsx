@@ -66,12 +66,17 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
             </p>
           </div>
 
-          {/* Clean Contact Tags */}
-          <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500">
-            {p.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3 text-slate-400" /> {p.location}</span>}
-            {p.email && <span className="flex items-center gap-1"><Mail className="w-3 h-3 text-slate-400" /> {p.email}</span>}
-            {p.phone && <span className="flex items-center gap-1"><Phone className="w-3 h-3 text-slate-400" /> {p.phone}</span>}
-            {p.linkedin && <span className="flex items-center gap-1"><Linkedin className="w-3 h-3 text-slate-400" /> {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {/* Clean Pipe Separated Contacts */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500 font-mono">
+            {p.email && <a href={`mailto:${p.email}`} className="hover:underline">{p.email}</a>}
+            {p.email && p.phone && <span className="text-slate-300">|</span>}
+            {p.phone && <span>{p.phone}</span>}
+            {(p.email || p.phone) && p.location && <span className="text-slate-300">|</span>}
+            {p.location && <span>{p.location}</span>}
+            {p.linkedin && <span className="text-slate-300">|</span>}
+            {p.linkedin && <a href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`} target="_blank" rel="noreferrer" className="hover:underline">{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>}
+            {p.github && <span className="text-slate-300">|</span>}
+            {p.github && <a href={p.github.startsWith('http') ? p.github : `https://${p.github}`} target="_blank" rel="noreferrer" className="hover:underline">{p.github.replace(/^https?:\/\/(www\.)?/, '')}</a>}
           </div>
         </div>
       </header>
@@ -108,15 +113,15 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
                   />
 
                   <div className="flex justify-between items-baseline flex-wrap gap-1">
-                    <div>
-                      <span className="font-bold text-slate-900">{exp.role}</span>
-                      <span className="text-slate-400"> / </span>
+                    <div className="font-bold text-slate-900 text-[13.5px]">
+                      <span>{exp.role}</span>
+                      <span className="text-slate-400 font-normal mx-1 font-mono">|</span>
                       <span className="font-semibold" style={{ color: theme.accentColor }}>{exp.company}</span>
                     </div>
-                    <span className="text-xs font-mono text-slate-500">
+                    <div className="text-xs font-mono text-slate-500">
+                      {exp.location ? `${exp.location} | ` : ''}
                       {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
-                      {exp.location && ` (${exp.location})`}
-                    </span>
+                    </div>
                   </div>
 
                   {exp.bullets && exp.bullets.length > 0 && (
@@ -132,7 +137,7 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           </section>
         )}
 
-        {/* Skills Clean Pills */}
+        {/* Skills Clean Category Grouped Text */}
         {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section id="section-skills">
             <h2
@@ -142,19 +147,35 @@ export const NordicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
               <span className="w-2 h-2 rounded-full" style={{ backgroundColor: theme.accentColor }} />
               Competencies & Skills
             </h2>
-            <div className="flex flex-wrap gap-1.5">
-              {resume.skills.map((skill) => (
-                <span
-                  key={skill.id}
-                  className="px-2.5 py-1 rounded-lg text-xs font-medium bg-white text-slate-800 border border-slate-200/90 shadow-2xs hover:border-slate-300 transition-colors"
-                >
-                  {skill.name}
-                  {skill.level && (
-                    <span className="text-[10px] text-slate-400 ml-1">· {skill.level}</span>
-                  )}
-                </span>
-              ))}
-            </div>
+            {(() => {
+              const categories: Record<string, string[]> = {};
+
+              resume.skills.forEach((s) => {
+                const cat = s.category || 'Core Skills';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(s.name);
+              });
+
+              const catKeys = Object.keys(categories);
+              if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Skills')) {
+                return (
+                  <div className="space-y-1 text-xs text-slate-800 leading-relaxed">
+                    {catKeys.map((cat) => (
+                      <div key={cat}>
+                        <span className="font-bold text-slate-900">{cat}: </span>
+                        <span>{categories[cat].join(', ')}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return (
+                <p className="text-slate-800 text-xs leading-relaxed">
+                  {resume.skills.map((s) => s.name).join(', ')}
+                </p>
+              );
+            })()}
           </section>
         )}
 

@@ -52,13 +52,18 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
             {p.title}
           </p>
         )}
-        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-600 mt-2 font-mono">
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-zinc-600 mt-2 font-mono">
+          {p.email && <span>{p.email}</span>}
+          {p.email && p.phone && <span className="text-zinc-400">|</span>}
+          {p.phone && <span>{p.phone}</span>}
+          {(p.email || p.phone) && p.location && <span className="text-zinc-400">|</span>}
           {p.location && <span>{p.location}</span>}
-          {p.phone && <span>• {p.phone}</span>}
-          {p.email && <span>• {p.email}</span>}
-          {p.linkedin && <span>• {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
-          {p.website && <span>• {p.website.replace(/^https?:\/\//, '')}</span>}
-          {p.github && <span>• {p.github.replace(/^https?:\/\//, '')}</span>}
+          {p.linkedin && <span className="text-zinc-400">|</span>}
+          {p.linkedin && <span>{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {p.github && <span className="text-zinc-400">|</span>}
+          {p.github && <span>{p.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {p.website && <span className="text-zinc-400">|</span>}
+          {p.website && <span>{p.website.replace(/^https?:\/\//, '')}</span>}
         </div>
       </header>
 
@@ -86,15 +91,16 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
                 <div className={spacingClasses.itemGap}>
                   {resume.experience.map((exp) => (
                     <div key={exp.id} className="break-inside-avoid">
-                      <div className="flex justify-between items-baseline">
-                        <span className="font-bold text-zinc-950">{exp.role}</span>
-                        <span className="text-xs font-mono text-zinc-600">
-                          {exp.startDate} — {exp.current ? 'Present' : exp.endDate}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-baseline text-xs text-zinc-700 font-medium">
-                        <span>{exp.company}</span>
-                        {exp.location && <span>{exp.location}</span>}
+                      <div className="flex justify-between items-baseline flex-wrap gap-1">
+                        <div className="font-bold text-zinc-950 text-[13.5px]">
+                          <span>{exp.role}</span>
+                          <span className="text-zinc-400 font-normal mx-1 font-mono">|</span>
+                          <span className="font-semibold text-zinc-800">{exp.company}</span>
+                        </div>
+                        <div className="text-xs font-mono text-zinc-600">
+                          {exp.location ? `${exp.location} | ` : ''}
+                          {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
+                        </div>
                       </div>
                       {exp.bullets && exp.bullets.length > 0 && (
                         <ul className={`mt-1 list-disc list-outside pl-4 text-zinc-800 ${spacingClasses.bulletGap}`}>
@@ -114,10 +120,35 @@ export const MinimalTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
                 <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-900 border-b border-zinc-300 pb-0.5 mb-1.5 font-mono">
                   Technical & Core Skills
                 </h2>
-                <p className="text-zinc-800">
-                  <span className="font-semibold text-zinc-900">Skills: </span>
-                  {resume.skills.map((s) => s.name).join(' • ')}
-                </p>
+                {(() => {
+                  const categories: Record<string, string[]> = {};
+
+                  resume.skills.forEach((s) => {
+                    const cat = s.category || 'Core Skills';
+                    if (!categories[cat]) categories[cat] = [];
+                    categories[cat].push(s.name);
+                  });
+
+                  const catKeys = Object.keys(categories);
+                  if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Skills')) {
+                    return (
+                      <div className="space-y-1 text-xs text-zinc-800 leading-relaxed">
+                        {catKeys.map((cat) => (
+                          <div key={cat}>
+                            <span className="font-bold text-zinc-900">{cat}: </span>
+                            <span>{categories[cat].join(', ')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <p className="text-zinc-800 text-xs leading-relaxed">
+                      {resume.skills.map((s) => s.name).join(', ')}
+                    </p>
+                  );
+                })()}
               </section>
             );
           }

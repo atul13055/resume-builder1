@@ -48,20 +48,13 @@ export async function exportToPdf(
   const pageHeight = doc.internal.pageSize.getHeight();
 
   if (singlePage) {
-    // Exact single page fit
-    let renderWidth = pageWidth;
-    let renderHeight = (img.naturalHeight * pageWidth) / img.naturalWidth;
-    let xOffset = 0;
-    let yOffset = 0;
+    // Fill 100% page width to eliminate left/right white space margins
+    const renderWidth = pageWidth;
+    const calcHeight = (img.naturalHeight * pageWidth) / img.naturalWidth;
+    // Scale smoothly if height exceeds page height, keeping full width alignment
+    const finalHeight = calcHeight > pageHeight ? pageHeight : calcHeight;
 
-    // If the content height exceeds 1 page, scale down proportionally to fit completely within single page
-    if (renderHeight > pageHeight) {
-      renderHeight = pageHeight;
-      renderWidth = (img.naturalWidth * pageHeight) / img.naturalHeight;
-      xOffset = (pageWidth - renderWidth) / 2;
-    }
-
-    doc.addImage(imgData, 'PNG', xOffset, yOffset, renderWidth, renderHeight, undefined, 'FAST');
+    doc.addImage(imgData, 'PNG', 0, 0, renderWidth, finalHeight, undefined, 'FAST');
   } else {
     // Multi-page document slicing
     const imgWidth = pageWidth;

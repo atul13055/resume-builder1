@@ -85,33 +85,19 @@ export const InfographicTemplate: React.FC<TemplateProps> = ({ resume, theme }) 
             </p>
           </div>
 
-          {/* Contact Box */}
-          <div className="flex flex-wrap gap-2 text-xs">
-            {p.email && (
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">
-                <Mail className="w-3 h-3 text-slate-400" /> {p.email}
-              </span>
-            )}
-            {p.phone && (
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">
-                <Phone className="w-3 h-3 text-slate-400" /> {p.phone}
-              </span>
-            )}
-            {p.location && (
-              <span className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200">
-                <MapPin className="w-3 h-3 text-slate-400" /> {p.location}
-              </span>
-            )}
-            {p.linkedin && (
-              <a
-                href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 hover:bg-slate-100"
-              >
-                <Linkedin className="w-3 h-3 text-blue-500" /> {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
-              </a>
-            )}
+          {/* Contact Line */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-600 font-mono">
+            {p.email && <span>{p.email}</span>}
+            {p.email && p.phone && <span className="text-slate-300">|</span>}
+            {p.phone && <span>{p.phone}</span>}
+            {(p.email || p.phone) && p.location && <span className="text-slate-300">|</span>}
+            {p.location && <span>{p.location}</span>}
+            {p.website && <span className="text-slate-300">|</span>}
+            {p.website && <span>{p.website.replace(/^https?:\/\//, '')}</span>}
+            {p.linkedin && <span className="text-slate-300">|</span>}
+            {p.linkedin && <span>{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+            {p.github && <span className="text-slate-300">|</span>}
+            {p.github && <span>{p.github.replace(/^https?:\/\//, '')}</span>}
           </div>
         </div>
       </header>
@@ -132,41 +118,45 @@ export const InfographicTemplate: React.FC<TemplateProps> = ({ resume, theme }) 
           </section>
         )}
 
-        {/* Dynamic Skill Level Progress Indicators */}
+        {/* Clean Category Grouped Plain Text Skills */}
         {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section id="section-skills">
             <h2
-              className="text-xs font-black uppercase tracking-wider mb-3 flex items-center gap-1.5"
+              className="text-xs font-black uppercase tracking-wider mb-2 flex items-center gap-1.5"
               style={{ color: theme.primaryColor }}
             >
               <Zap className="w-4 h-4" style={{ color: theme.accentColor }} />
-              Core Competencies & Proficiency Level
+              Core Competencies & Skills
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {resume.skills.map((skill) => {
-                const percent = getSkillPercent(skill.level);
+            {(() => {
+              const categories: Record<string, string[]> = {};
+
+              resume.skills.forEach((s) => {
+                const cat = s.category || 'Core Skills';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(s.name);
+              });
+
+              const catKeys = Object.keys(categories);
+              if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Skills')) {
                 return (
-                  <div key={skill.id} className="p-2.5 rounded-lg border border-slate-200 bg-white">
-                    <div className="flex justify-between items-center text-xs mb-1.5">
-                      <span className="font-bold text-slate-800">{skill.name}</span>
-                      <span className="text-[10px] font-semibold text-slate-400 capitalize">
-                        {skill.level || 'proficient'}
-                      </span>
-                    </div>
-                    {/* Visual Progress Bar */}
-                    <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${percent}%`,
-                          backgroundColor: theme.accentColor,
-                        }}
-                      />
-                    </div>
+                  <div className="space-y-1 text-xs text-slate-800 leading-relaxed">
+                    {catKeys.map((cat) => (
+                      <div key={cat}>
+                        <span className="font-bold text-slate-900">{cat}: </span>
+                        <span>{categories[cat].join(', ')}</span>
+                      </div>
+                    ))}
                   </div>
                 );
-              })}
-            </div>
+              }
+
+              return (
+                <p className="text-slate-800 text-xs leading-relaxed">
+                  {resume.skills.map((s) => s.name).join(', ')}
+                </p>
+              );
+            })()}
           </section>
         )}
 
@@ -184,15 +174,15 @@ export const InfographicTemplate: React.FC<TemplateProps> = ({ resume, theme }) 
               {resume.experience.map((exp) => (
                 <div key={exp.id} className="break-inside-avoid">
                   <div className="flex justify-between items-baseline flex-wrap gap-1">
-                    <div>
-                      <span className="font-black text-slate-900">{exp.role}</span>
-                      <span className="text-slate-400 font-normal"> // </span>
+                    <div className="font-black text-slate-900 text-[13.5px]">
+                      <span>{exp.role}</span>
+                      <span className="text-slate-400 font-normal mx-1 font-mono">|</span>
                       <span className="font-bold" style={{ color: theme.accentColor }}>{exp.company}</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-slate-500">
+                    <div className="text-xs font-mono font-bold text-slate-500">
+                      {exp.location ? `${exp.location} | ` : ''}
                       {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
-                      {exp.location && ` (${exp.location})`}
-                    </span>
+                    </div>
                   </div>
 
                   {exp.bullets && exp.bullets.length > 0 && (

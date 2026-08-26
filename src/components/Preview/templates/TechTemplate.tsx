@@ -85,44 +85,29 @@ export const TechTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
             </div>
           </div>
 
-          {/* Social / Dev Links Box */}
-          <div className="flex flex-wrap gap-2 text-xs font-mono">
-            {p.email && (
-              <a
-                href={`mailto:${p.email}`}
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
-              >
-                <Mail className="w-3 h-3" /> {p.email}
-              </a>
-            )}
+          {/* Clean Pipe-Separated Contacts */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs font-mono text-slate-600">
+            {p.email && <a href={`mailto:${p.email}`} className="hover:underline">{p.email}</a>}
+            {p.email && p.phone && <span className="text-slate-400">|</span>}
+            {p.phone && <span>{p.phone}</span>}
+            {(p.email || p.phone) && p.location && <span className="text-slate-400">|</span>}
+            {p.location && <span>{p.location}</span>}
+            {p.github && <span className="text-slate-400">|</span>}
             {p.github && (
-              <a
-                href={p.github.startsWith('http') ? p.github : `https://${p.github}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-2xs"
-              >
-                <Github className="w-3 h-3" /> {p.github.replace(/^https?:\/\/(www\.)?github\.com\//, 'gh/')}
+              <a href={p.github.startsWith('http') ? p.github : `https://${p.github}`} target="_blank" rel="noreferrer" className="hover:underline font-bold text-slate-900">
+                {p.github.replace(/^https?:\/\/(www\.)?/, '')}
               </a>
             )}
+            {p.linkedin && <span className="text-slate-400">|</span>}
             {p.linkedin && (
-              <a
-                href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors border border-blue-200"
-              >
-                <Linkedin className="w-3 h-3" /> {p.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, 'in/')}
+              <a href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`} target="_blank" rel="noreferrer" className="hover:underline">
+                {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
               </a>
             )}
+            {p.website && <span className="text-slate-400">|</span>}
             {p.website && (
-              <a
-                href={p.website.startsWith('http') ? p.website : `https://${p.website}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors border border-slate-200"
-              >
-                <Globe className="w-3 h-3" /> {p.website.replace(/^https?:\/\//, '')}
+              <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noreferrer" className="hover:underline">
+                {p.website.replace(/^https?:\/\//, '')}
               </a>
             )}
           </div>
@@ -142,29 +127,18 @@ export const TechTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           </section>
         )}
 
-        {/* Technical Stack / Skills Matrix */}
+        {/* Technical Stack / Skills Matrix (Clean ATS Text Format) */}
         {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section id="section-skills" className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200">
-            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 mb-2.5 flex items-center gap-1.5">
+            <h2 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 mb-2 flex items-center gap-1.5">
               <Code2 className="w-3.5 h-3.5" style={{ color: theme.accentColor }} />
               // TECHNICAL_STACK & COMPETENCIES
             </h2>
-            <div className="space-y-2 text-xs">
+            <div className="space-y-1 text-xs">
               {(Object.entries(skillCategories) as [string, string[]][]).map(([cat, skills]) => (
-                <div key={cat} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                  <span className="font-mono font-bold text-slate-800 text-[11px] min-w-[130px] shrink-0">
-                    {cat}:
-                  </span>
-                  <div className="flex flex-wrap gap-1">
-                    {skills.map((s, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-white text-slate-800 border border-slate-300 shadow-2xs"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
+                <div key={cat} className="leading-relaxed">
+                  <span className="font-mono font-bold text-slate-900">{cat}: </span>
+                  <span className="font-mono text-slate-800">{skills.join(', ')}</span>
                 </div>
               ))}
             </div>
@@ -182,15 +156,15 @@ export const TechTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
               {resume.experience.map((exp) => (
                 <div key={exp.id} className="break-inside-avoid">
                   <div className="flex justify-between items-baseline flex-wrap gap-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-slate-900">{exp.role}</span>
-                      <span className="font-mono text-slate-400">@</span>
+                    <div className="font-bold text-slate-900 text-[13.5px]">
+                      <span>{exp.role}</span>
+                      <span className="text-slate-400 font-normal mx-1 font-mono">|</span>
                       <span className="font-bold" style={{ color: theme.accentColor }}>{exp.company}</span>
                     </div>
-                    <span className="text-xs font-mono font-medium text-slate-500">
+                    <div className="text-xs font-mono font-medium text-slate-500">
+                      {exp.location ? `${exp.location} | ` : ''}
                       {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
-                      {exp.location && ` | ${exp.location}`}
-                    </span>
+                    </div>
                   </div>
 
                   {exp.bullets && exp.bullets.length > 0 && (

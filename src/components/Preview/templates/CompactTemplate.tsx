@@ -47,12 +47,16 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
             {p.title || 'Professional Title'}
           </p>
         </div>
-        <div className="text-[11px] text-slate-600 flex flex-wrap gap-x-3 gap-y-0.5 justify-end">
+        <div className="text-[11px] text-slate-600 flex flex-wrap gap-x-2 gap-y-0.5 justify-end font-mono">
           {p.email && <span>{p.email}</span>}
-          {p.phone && <span>• {p.phone}</span>}
-          {p.location && <span>• {p.location}</span>}
-          {p.linkedin && <span>• {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
-          {p.github && <span>• {p.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {p.email && p.phone && <span className="text-slate-400">|</span>}
+          {p.phone && <span>{p.phone}</span>}
+          {(p.email || p.phone) && p.location && <span className="text-slate-400">|</span>}
+          {p.location && <span>{p.location}</span>}
+          {p.linkedin && <span className="text-slate-400">|</span>}
+          {p.linkedin && <span>{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {p.github && <span className="text-slate-400">|</span>}
+          {p.github && <span>{p.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
         </div>
       </header>
 
@@ -85,17 +89,19 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
               <div className="space-y-3">
                 {resume.experience.map((exp) => (
                   <div key={exp.id} className="break-inside-avoid">
-                    <div className="flex justify-between items-baseline">
-                      <span className="font-bold text-slate-900">{exp.role}</span>
-                      <span className="text-[10px] text-slate-500 font-medium">
-                        {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                      </span>
-                    </div>
-                    <div className="text-[11px] font-semibold mb-1" style={{ color: theme.accentColor }}>
-                      {exp.company} {exp.location && `| ${exp.location}`}
+                    <div className="flex justify-between items-baseline flex-wrap gap-1">
+                      <div className="font-bold text-slate-900 text-xs">
+                        <span>{exp.role}</span>
+                        <span className="text-slate-400 font-normal mx-1 font-mono">|</span>
+                        <span className="font-semibold text-slate-700">{exp.company}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-500 font-mono">
+                        {exp.location ? `${exp.location} | ` : ''}
+                        {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
+                      </div>
                     </div>
                     {exp.bullets && exp.bullets.length > 0 && (
-                      <ul className="list-disc list-outside pl-3.5 space-y-0.5 text-slate-700">
+                      <ul className="mt-1 list-disc list-outside pl-3.5 space-y-0.5 text-slate-700">
                         {exp.bullets.map((b, i) => b.trim() && <li key={i} className="leading-snug">{b}</li>)}
                       </ul>
                     )}
@@ -140,7 +146,7 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
 
         {/* Right Sidebar Column (4 cols) */}
         <div className="col-span-12 md:col-span-4 space-y-4 border-l md:border-slate-200 md:pl-4">
-          {/* Skills */}
+          {/* Skills (Plain Text Category Grouped) */}
           {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
             <section>
               <h2
@@ -149,16 +155,35 @@ export const CompactTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
               >
                 Core Skills
               </h2>
-              <div className="flex flex-wrap gap-1">
-                {resume.skills.map((s) => (
-                  <span
-                    key={s.id}
-                    className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 text-slate-800 border border-slate-200"
-                  >
-                    {s.name}
-                  </span>
-                ))}
-              </div>
+              {(() => {
+                const categories: Record<string, string[]> = {};
+
+                resume.skills.forEach((s) => {
+                  const cat = s.category || 'Skills';
+                  if (!categories[cat]) categories[cat] = [];
+                  categories[cat].push(s.name);
+                });
+
+                const catKeys = Object.keys(categories);
+                if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Skills')) {
+                  return (
+                    <div className="space-y-1 text-[11px] text-slate-800 leading-normal">
+                      {catKeys.map((cat) => (
+                        <div key={cat}>
+                          <span className="font-bold text-slate-900">{cat}: </span>
+                          <span>{categories[cat].join(', ')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+
+                return (
+                  <p className="text-slate-800 text-[11px] leading-normal">
+                    {resume.skills.map((s) => s.name).join(', ')}
+                  </p>
+                );
+              })()}
             </section>
           )}
 

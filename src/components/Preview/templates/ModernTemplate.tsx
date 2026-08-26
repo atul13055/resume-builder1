@@ -69,49 +69,35 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
               {p.title || 'Professional Title'}
             </p>
 
-            {/* Contact Pills */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-600">
-              {p.email && (
-                <span className="flex items-center gap-1">
-                  {theme.showIcons && <Mail className="w-3.5 h-3.5 text-slate-400" />}
-                  <a href={`mailto:${p.email}`} className="hover:underline">{p.email}</a>
-                </span>
-              )}
-              {p.phone && (
-                <span className="flex items-center gap-1">
-                  {theme.showIcons && <Phone className="w-3.5 h-3.5 text-slate-400" />}
-                  <span>{p.phone}</span>
-                </span>
-              )}
-              {p.location && (
-                <span className="flex items-center gap-1">
-                  {theme.showIcons && <MapPin className="w-3.5 h-3.5 text-slate-400" />}
-                  <span>{p.location}</span>
-                </span>
-              )}
-              {p.website && (
-                <span className="flex items-center gap-1">
-                  {theme.showIcons && <Globe className="w-3.5 h-3.5 text-slate-400" />}
-                  <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noreferrer" className="hover:underline">
-                    {p.website.replace(/^https?:\/\//, '')}
-                  </a>
-                </span>
-              )}
-              {p.linkedin && (
-                <span className="flex items-center gap-1">
-                  {theme.showIcons && <Linkedin className="w-3.5 h-3.5 text-slate-400" />}
-                  <a href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`} target="_blank" rel="noreferrer" className="hover:underline">
-                    {p.linkedin.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, 'in/')}
-                  </a>
-                </span>
-              )}
-              {p.github && (
-                <span className="flex items-center gap-1">
-                  {theme.showIcons && <Github className="w-3.5 h-3.5 text-slate-400" />}
-                  <a href={p.github.startsWith('http') ? p.github : `https://${p.github}`} target="_blank" rel="noreferrer" className="hover:underline">
-                    {p.github.replace(/^https?:\/\/(www\.)?github\.com\//, 'github/')}
-                  </a>
-                </span>
+            {/* Clean ATS-Optimized Contact Lines (Pipe Separated) */}
+            <div className="text-xs text-slate-600 space-y-0.5">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                {p.email && <a href={`mailto:${p.email}`} className="hover:underline">{p.email}</a>}
+                {p.email && p.phone && <span className="text-slate-300">|</span>}
+                {p.phone && <span>{p.phone}</span>}
+                {(p.email || p.phone) && p.location && <span className="text-slate-300">|</span>}
+                {p.location && <span>{p.location}</span>}
+              </div>
+              {(p.linkedin || p.github || p.website) && (
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-slate-500">
+                  {p.linkedin && (
+                    <a href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`} target="_blank" rel="noreferrer" className="hover:underline">
+                      {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
+                    </a>
+                  )}
+                  {p.linkedin && p.github && <span className="text-slate-300">|</span>}
+                  {p.github && (
+                    <a href={p.github.startsWith('http') ? p.github : `https://${p.github}`} target="_blank" rel="noreferrer" className="hover:underline">
+                      {p.github.replace(/^https?:\/\/(www\.)?/, '')}
+                    </a>
+                  )}
+                  {(p.linkedin || p.github) && p.website && <span className="text-slate-300">|</span>}
+                  {p.website && (
+                    <a href={p.website.startsWith('http') ? p.website : `https://${p.website}`} target="_blank" rel="noreferrer" className="hover:underline">
+                      {p.website.replace(/^https?:\/\//, '')}
+                    </a>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -156,15 +142,15 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
               {resume.experience.map((exp) => (
                 <div key={exp.id} className="break-inside-avoid">
                   <div className="flex justify-between items-baseline flex-wrap gap-1">
-                    <div>
-                      <span className="font-bold text-slate-900">{exp.role}</span>
-                      <span className="text-slate-500 font-medium"> – </span>
+                    <div className="font-bold text-slate-900 text-[13.5px]">
+                      <span>{exp.role}</span>
+                      <span className="text-slate-400 font-normal mx-1">|</span>
                       <span className="font-semibold" style={{ color: theme.accentColor }}>{exp.company}</span>
                     </div>
-                    <span className="text-xs font-medium text-slate-500">
+                    <div className="text-xs font-medium text-slate-500 font-mono">
+                      {exp.location ? `${exp.location} | ` : ''}
                       {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
-                      {exp.location && ` | ${exp.location}`}
-                    </span>
+                    </div>
                   </div>
 
                   {exp.bullets && exp.bullets.length > 0 && (
@@ -182,7 +168,7 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
           </section>
         )}
 
-        {/* Skills */}
+        {/* Skills (Clean ATS Category-Grouped Text, No Pills) */}
         {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section id="section-skills">
             <h2
@@ -191,19 +177,36 @@ export const ModernTemplate: React.FC<TemplateProps> = ({ resume, theme }) => {
             >
               Skills & Expertise
             </h2>
-            <div className="flex flex-wrap gap-1.5">
-              {resume.skills.map((skill) => (
-                <span
-                  key={skill.id}
-                  className="px-2.5 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200"
-                >
-                  {skill.name}
-                  {skill.level && (
-                    <span className="text-[10px] text-slate-500 ml-1">({skill.level})</span>
-                  )}
-                </span>
-              ))}
-            </div>
+            {(() => {
+              const categories: Record<string, string[]> = {};
+              const uncategorized: string[] = [];
+
+              resume.skills.forEach((s) => {
+                const cat = s.category || 'Core Skills';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(s.name);
+              });
+
+              const catKeys = Object.keys(categories);
+              if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Skills')) {
+                return (
+                  <div className="space-y-1 text-xs text-slate-800 leading-relaxed">
+                    {catKeys.map((cat) => (
+                      <div key={cat}>
+                        <span className="font-bold text-slate-900">{cat}: </span>
+                        <span>{categories[cat].join(', ')}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return (
+                <p className="text-slate-800 text-xs leading-relaxed">
+                  {resume.skills.map((s) => s.name).join(', ')}
+                </p>
+              );
+            })()}
           </section>
         )}
 

@@ -204,24 +204,22 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 font-sans text-slate-800">
+    <div className={currentView === 'home' ? "min-h-screen bg-slate-950 font-sans text-slate-800" : "flex flex-col h-screen w-screen overflow-hidden bg-slate-950 font-sans text-slate-800"}>
       {currentView === 'home' ? (
-        <div className="flex-1 overflow-y-auto">
-          <HomePage
-            onLaunchBuilder={() => setCurrentView('builder')}
-            onSelectTemplate={(tpl) => {
-              handleSelectTemplate(tpl);
-              setCurrentView('builder');
-            }}
-            onLoadSample={(sampleKey) => {
-              handleLoadSample(sampleKey);
-              setCurrentView('builder');
-            }}
-            onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
-            onOpenAuthModal={() => {}}
-            onOpenCloudResumesModal={() => setIsCloudResumesModalOpen(true)}
-          />
-        </div>
+        <HomePage
+          onLaunchBuilder={() => setCurrentView('builder')}
+          onSelectTemplate={(tpl) => {
+            handleSelectTemplate(tpl);
+            setCurrentView('builder');
+          }}
+          onLoadSample={(sampleKey) => {
+            handleLoadSample(sampleKey);
+            setCurrentView('builder');
+          }}
+          onOpenLinkedInModal={() => setIsLinkedInModalOpen(true)}
+          onOpenAuthModal={() => handleOpenAuth('signin')}
+          onOpenCloudResumesModal={() => setIsCloudResumesModalOpen(true)}
+        />
       ) : (
         <>
           {/* Top Navbar with Undo/Redo & Home Navigation */}

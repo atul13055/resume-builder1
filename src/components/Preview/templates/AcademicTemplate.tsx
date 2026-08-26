@@ -39,13 +39,18 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
             {p.title}
           </p>
         )}
-        <div className="flex flex-wrap justify-center items-center gap-x-3 gap-y-1 text-xs text-stone-700">
+        <div className="flex flex-wrap justify-center items-center gap-x-2 gap-y-0.5 text-xs text-stone-700 font-serif">
+          {p.email && <span>{p.email}</span>}
+          {p.email && p.phone && <span className="text-stone-400">|</span>}
+          {p.phone && <span>{p.phone}</span>}
+          {(p.email || p.phone) && p.location && <span className="text-stone-400">|</span>}
           {p.location && <span>{p.location}</span>}
-          {p.phone && <span>• {p.phone}</span>}
-          {p.email && <span>• {p.email}</span>}
-          {p.website && <span>• {p.website.replace(/^https?:\/\//, '')}</span>}
-          {p.linkedin && <span>• {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
-          {p.github && <span>• {p.github.replace(/^https?:\/\//, '')}</span>}
+          {p.website && <span className="text-stone-400">|</span>}
+          {p.website && <span>{p.website.replace(/^https?:\/\//, '')}</span>}
+          {p.linkedin && <span className="text-stone-400">|</span>}
+          {p.linkedin && <span>{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+          {p.github && <span className="text-stone-400">|</span>}
+          {p.github && <span>{p.github.replace(/^https?:\/\//, '')}</span>}
         </div>
       </header>
 
@@ -63,7 +68,7 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
                     <span className="font-bold text-stone-900">
                       {edu.school}, {edu.location}
                     </span>
-                    <span className="text-xs text-stone-600 italic">
+                    <span className="text-xs text-stone-600 italic font-serif">
                       {edu.startDate} – {edu.endDate}
                     </span>
                   </div>
@@ -101,17 +106,19 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
             <div className="space-y-3.5">
               {resume.experience.map((exp) => (
                 <div key={exp.id} className="break-inside-avoid">
-                  <div className="flex justify-between items-baseline">
-                    <span className="font-bold text-stone-900">{exp.company}</span>
-                    <span className="text-xs text-stone-600 italic">
-                      {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                    </span>
-                  </div>
-                  <div className="text-xs italic font-semibold text-stone-800 mb-1">
-                    {exp.role} {exp.location ? `| ${exp.location}` : ''}
+                  <div className="flex justify-between items-baseline flex-wrap gap-1">
+                    <div className="font-bold text-stone-900 text-[13.5px]">
+                      <span>{exp.role}</span>
+                      <span className="text-stone-400 font-normal mx-1">|</span>
+                      <span className="font-semibold text-stone-800">{exp.company}</span>
+                    </div>
+                    <div className="text-xs text-stone-600 italic font-serif">
+                      {exp.location ? `${exp.location} | ` : ''}
+                      {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
+                    </div>
                   </div>
                   {exp.bullets && exp.bullets.length > 0 && (
-                    <ul className="list-disc list-outside pl-4 space-y-1 text-stone-800 text-xs">
+                    <ul className="list-disc list-outside pl-4 space-y-1 text-stone-800 text-xs mt-1">
                       {exp.bullets.map((b, i) => b.trim() && <li key={i}>{b}</li>)}
                     </ul>
                   )}
@@ -147,15 +154,41 @@ export const AcademicTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
           </section>
         )}
 
-        {/* Skills & Honors */}
+        {/* Skills & Honors (Category Grouped Clean Text) */}
         {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section>
             <h2 className="text-xs font-bold uppercase tracking-widest text-stone-900 border-b border-stone-300 pb-1 mb-1.5">
               Areas of Expertise & Skills
             </h2>
-            <p className="text-stone-800 text-xs leading-relaxed">
-              {resume.skills.map((s) => s.name).join(' • ')}
-            </p>
+            {(() => {
+              const categories: Record<string, string[]> = {};
+
+              resume.skills.forEach((s) => {
+                const cat = s.category || 'Core Skills';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(s.name);
+              });
+
+              const catKeys = Object.keys(categories);
+              if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Skills')) {
+                return (
+                  <div className="space-y-1 text-xs text-stone-800 leading-relaxed">
+                    {catKeys.map((cat) => (
+                      <div key={cat}>
+                        <span className="font-bold text-stone-900">{cat}: </span>
+                        <span>{categories[cat].join(', ')}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return (
+                <p className="text-stone-800 text-xs leading-relaxed">
+                  {resume.skills.map((s) => s.name).join(', ')}
+                </p>
+              );
+            })()}
           </section>
         )}
 

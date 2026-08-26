@@ -74,38 +74,23 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resume, theme }) =>
             </p>
           </div>
 
-          {/* Contact Details Grid */}
-          <div className="flex flex-col sm:items-end gap-1 text-xs text-slate-200">
-            {p.email && (
-              <span className="flex items-center gap-1.5">
-                {theme.showIcons && <Mail className="w-3.5 h-3.5 opacity-80" />}
-                <a href={`mailto:${p.email}`} className="hover:underline text-slate-100">{p.email}</a>
-              </span>
-            )}
-            {p.phone && (
-              <span className="flex items-center gap-1.5">
-                {theme.showIcons && <Phone className="w-3.5 h-3.5 opacity-80" />}
-                <span>{p.phone}</span>
-              </span>
-            )}
-            {p.location && (
-              <span className="flex items-center gap-1.5">
-                {theme.showIcons && <MapPin className="w-3.5 h-3.5 opacity-80" />}
-                <span>{p.location}</span>
-              </span>
-            )}
+          {/* Clean ATS Contact Details */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-200 font-mono">
+            {p.email && <a href={`mailto:${p.email}`} className="hover:underline text-slate-100">{p.email}</a>}
+            {p.email && p.phone && <span className="text-slate-400">|</span>}
+            {p.phone && <span>{p.phone}</span>}
+            {(p.email || p.phone) && p.location && <span className="text-slate-400">|</span>}
+            {p.location && <span>{p.location}</span>}
+            {p.linkedin && <span className="text-slate-400">|</span>}
             {p.linkedin && (
-              <span className="flex items-center gap-1.5">
-                {theme.showIcons && <Linkedin className="w-3.5 h-3.5 opacity-80" />}
-                <a
-                  href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:underline text-slate-100"
-                >
-                  {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
-                </a>
-              </span>
+              <a
+                href={p.linkedin.startsWith('http') ? p.linkedin : `https://${p.linkedin}`}
+                target="_blank"
+                rel="noreferrer"
+                className="hover:underline text-slate-100"
+              >
+                {p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}
+              </a>
             )}
           </div>
         </div>
@@ -133,7 +118,7 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resume, theme }) =>
           </section>
         )}
 
-        {/* Core Competencies / Skills Matrix */}
+        {/* Skills Section (Category Grouped Clean Plain Text) */}
         {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
           <section id="section-skills">
             <h2
@@ -142,24 +127,35 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resume, theme }) =>
             >
               <span>Areas of Strategic Expertise & Core Competencies</span>
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {resume.skills.map((skill) => (
-                <div
-                  key={skill.id}
-                  className="p-2 rounded-lg border border-slate-200 bg-white flex items-center justify-between shadow-2xs"
-                >
-                  <span className="font-semibold text-xs text-slate-800">{skill.name}</span>
-                  {skill.level && (
-                    <span
-                      className="text-[10px] font-bold px-1.5 py-0.5 rounded text-white"
-                      style={{ backgroundColor: theme.accentColor }}
-                    >
-                      {skill.level}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
+            {(() => {
+              const categories: Record<string, string[]> = {};
+
+              resume.skills.forEach((s) => {
+                const cat = s.category || 'Core Competencies';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(s.name);
+              });
+
+              const catKeys = Object.keys(categories);
+              if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Competencies')) {
+                return (
+                  <div className="space-y-1 text-xs text-slate-800 leading-relaxed">
+                    {catKeys.map((cat) => (
+                      <div key={cat}>
+                        <span className="font-bold text-slate-900">{cat}: </span>
+                        <span>{categories[cat].join(', ')}</span>
+                      </div>
+                    ))}
+                  </div>
+                );
+              }
+
+              return (
+                <p className="text-slate-800 text-xs leading-relaxed">
+                  {resume.skills.map((s) => s.name).join(', ')}
+                </p>
+              );
+            })()}
           </section>
         )}
 
@@ -176,15 +172,15 @@ export const ExecutiveTemplate: React.FC<TemplateProps> = ({ resume, theme }) =>
               {resume.experience.map((exp) => (
                 <div key={exp.id} className="break-inside-avoid">
                   <div className="flex justify-between items-baseline flex-wrap gap-1">
-                    <div>
-                      <span className="font-bold text-slate-950 text-sm sm:text-base">{exp.role}</span>
-                      <span className="text-slate-400 font-normal"> | </span>
+                    <div className="font-bold text-slate-950 text-sm sm:text-base">
+                      <span>{exp.role}</span>
+                      <span className="text-slate-400 font-normal mx-1">|</span>
                       <span className="font-bold" style={{ color: theme.accentColor }}>{exp.company}</span>
                     </div>
-                    <span className="text-xs font-bold text-slate-500 font-mono">
+                    <div className="text-xs font-bold text-slate-500 font-mono">
+                      {exp.location ? `${exp.location} | ` : ''}
                       {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
-                      {exp.location && ` (${exp.location})`}
-                    </span>
+                    </div>
                   </div>
 
                   {exp.bullets && exp.bullets.length > 0 && (

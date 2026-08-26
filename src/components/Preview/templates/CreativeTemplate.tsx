@@ -58,65 +58,54 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
 
           {/* Contact Details */}
           <div>
-            <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-3">
+            <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-2">
               Contact
             </h3>
-            <div className="space-y-2 text-xs text-white/90">
-              {p.email && (
-                <div className="flex items-center gap-2">
-                  <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                  <span className="truncate">{p.email}</span>
-                </div>
-              )}
-              {p.phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                  <span>{p.phone}</span>
-                </div>
-              )}
-              {p.location && (
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                  <span>{p.location}</span>
-                </div>
-              )}
-              {p.linkedin && (
-                <div className="flex items-center gap-2">
-                  <Linkedin className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                  <span className="truncate">{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>
-                </div>
-              )}
-              {p.github && (
-                <div className="flex items-center gap-2">
-                  <Github className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                  <span className="truncate">{p.github.replace(/^https?:\/\/(www\.)?/, '')}</span>
-                </div>
-              )}
-              {p.website && (
-                <div className="flex items-center gap-2">
-                  <Globe className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                  <span className="truncate">{p.website.replace(/^https?:\/\//, '')}</span>
-                </div>
-              )}
+            <div className="space-y-1 text-xs text-white/90 font-mono">
+              {p.email && <div>{p.email}</div>}
+              {p.phone && <div>{p.phone}</div>}
+              {p.location && <div>{p.location}</div>}
+              {p.linkedin && <div>{p.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</div>}
+              {p.github && <div>{p.github.replace(/^https?:\/\/(www\.)?/, '')}</div>}
+              {p.website && <div>{p.website.replace(/^https?:\/\//, '')}</div>}
             </div>
           </div>
 
-          {/* Skills Badges in Sidebar */}
+          {/* Skills Categorized Plain Text in Sidebar */}
           {!isHidden('skills') && resume.skills && resume.skills.length > 0 && (
             <div>
-              <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-3">
-                Skills & Tech
+              <h3 className="text-[11px] font-bold uppercase tracking-widest text-white/70 border-b border-white/20 pb-1 mb-2">
+                Skills & Expertise
               </h3>
-              <div className="flex flex-wrap gap-1.5">
-                {resume.skills.map((s) => (
-                  <span
-                    key={s.id}
-                    className="px-2 py-0.5 rounded text-[11px] font-medium bg-white/10 text-white border border-white/15"
-                  >
-                    {s.name}
-                  </span>
-                ))}
-              </div>
+              {(() => {
+                const categories: Record<string, string[]> = {};
+
+                resume.skills.forEach((s) => {
+                  const cat = s.category || 'Core Skills';
+                  if (!categories[cat]) categories[cat] = [];
+                  categories[cat].push(s.name);
+                });
+
+                const catKeys = Object.keys(categories);
+                if (catKeys.length > 1 || (catKeys.length === 1 && catKeys[0] !== 'Core Skills')) {
+                  return (
+                    <div className="space-y-1.5 text-xs text-white/90 leading-snug">
+                      {catKeys.map((cat) => (
+                        <div key={cat}>
+                          <span className="font-bold text-white">{cat}: </span>
+                          <span>{categories[cat].join(', ')}</span>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                }
+
+                return (
+                  <p className="text-white/90 text-xs leading-relaxed">
+                    {resume.skills.map((s) => s.name).join(', ')}
+                  </p>
+                );
+              })()}
             </div>
           )}
 
@@ -198,11 +187,16 @@ export const CreativeTemplate: React.FC<TemplateProps> = ({ resume, theme }) => 
             <div className="space-y-4">
               {resume.experience.map((exp) => (
                 <div key={exp.id} className="break-inside-avoid">
-                  <div className="flex justify-between items-baseline">
-                    <span className="font-bold text-slate-900">{exp.role}</span>
-                    <span className="text-xs text-slate-500 font-medium">
-                      {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                    </span>
+                  <div className="flex justify-between items-baseline flex-wrap gap-1">
+                    <div className="font-bold text-slate-900 text-[13.5px]">
+                      <span>{exp.role}</span>
+                      <span className="text-slate-400 font-normal mx-1 font-mono">|</span>
+                      <span className="font-semibold text-slate-700">{exp.company}</span>
+                    </div>
+                    <div className="text-xs text-slate-500 font-mono">
+                      {exp.location ? `${exp.location} | ` : ''}
+                      {exp.startDate} – {exp.current ? 'Present' : exp.endDate || ''}
+                    </div>
                   </div>
                   <div className="text-xs font-semibold text-slate-600 mb-1">
                     {exp.company} {exp.location ? `• ${exp.location}` : ''}

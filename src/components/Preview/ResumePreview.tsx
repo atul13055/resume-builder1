@@ -23,6 +23,7 @@ import {
   Maximize2,
   ChevronDown,
   Layers,
+  Type,
 } from 'lucide-react';
 import { exportToPdf, triggerPrintDialog } from '../../utils/pdfExport';
 import { exportToDocx } from '../../utils/docxExport';
@@ -49,6 +50,8 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [showPageSizeDropdown, setShowPageSizeDropdown] = useState(false);
+  const [showFontDropdown, setShowFontDropdown] = useState(false);
+  const [showFontSizeDropdown, setShowFontSizeDropdown] = useState(false);
 
   const activePaperSize: PaperSize = theme.paperSize || 'a4';
   const pageConfig = getPageSizeConfig(activePaperSize);
@@ -162,7 +165,11 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           <div className="relative">
             <button
               id="preview-page-size-selector-btn"
-              onClick={() => setShowPageSizeDropdown(!showPageSizeDropdown)}
+              onClick={() => {
+                setShowPageSizeDropdown(!showPageSizeDropdown);
+                setShowFontDropdown(false);
+                setShowFontSizeDropdown(false);
+              }}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-300 hover:border-slate-400 transition-all cursor-pointer shadow-2xs"
               title="Change Resume Page Size (A4, Letter, Legal, Executive)"
             >
@@ -212,6 +219,108 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                       </button>
                     );
                   })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Font Family Dropdown */}
+          <div className="relative">
+            <button
+              id="preview-font-family-btn"
+              onClick={() => {
+                setShowFontDropdown(!showFontDropdown);
+                setShowPageSizeDropdown(false);
+                setShowFontSizeDropdown(false);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-300 hover:border-slate-400 transition-all cursor-pointer shadow-2xs"
+              title="Change Resume Font Style (Sans, Serif, Monospace)"
+            >
+              <Type className="w-3.5 h-3.5 text-purple-600" />
+              <span className="font-semibold text-slate-500">Font:</span>
+              <span className="text-purple-700 font-extrabold capitalize">{theme.fontPairing || 'sans'}</span>
+              <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+            </button>
+
+            {showFontDropdown && (
+              <div className="absolute top-full left-0 mt-1.5 w-52 bg-white rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs animate-in fade-in-50 zoom-in-95 duration-150">
+                <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                  Select Font Style
+                </div>
+                <div className="p-1 space-y-1">
+                  {[
+                    { id: 'sans', name: 'Sans-Serif', desc: 'Inter / Modern Clean' },
+                    { id: 'serif', name: 'Serif', desc: 'Georgia / Classic Formal' },
+                    { id: 'mono', name: 'Monospace', desc: 'JetBrains / Code Style' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      onClick={() => {
+                        if (onChangeTheme) onChangeTheme({ ...theme, fontPairing: f.id as any });
+                        setShowFontDropdown(false);
+                      }}
+                      className={`w-full p-2 rounded-lg text-left transition-all cursor-pointer ${
+                        theme.fontPairing === f.id
+                          ? 'bg-purple-50 border border-purple-200 text-purple-900 font-bold'
+                          : 'hover:bg-slate-50 text-slate-700'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{f.name}</div>
+                      <div className="text-[10px] text-slate-400">{f.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Font Size Selector */}
+          <div className="relative">
+            <button
+              id="preview-font-size-btn"
+              onClick={() => {
+                setShowFontSizeDropdown(!showFontSizeDropdown);
+                setShowFontDropdown(false);
+                setShowPageSizeDropdown(false);
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-300 hover:border-slate-400 transition-all cursor-pointer shadow-2xs"
+              title="Adjust Resume Text Size (Small, Medium, Large)"
+            >
+              <span className="font-mono text-xs text-amber-600 font-black">A±</span>
+              <span className="font-semibold text-slate-500">Size:</span>
+              <span className="text-amber-700 font-extrabold uppercase">
+                {theme.fontSize === 'sm' ? 'Small' : theme.fontSize === 'lg' ? 'Large' : 'Medium'}
+              </span>
+              <ChevronDown className="w-3 h-3 text-slate-400 ml-0.5" />
+            </button>
+
+            {showFontSizeDropdown && (
+              <div className="absolute top-full left-0 mt-1.5 w-52 bg-white rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs animate-in fade-in-50 zoom-in-95 duration-150">
+                <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                  Select Text Size Scale
+                </div>
+                <div className="p-1 space-y-1">
+                  {[
+                    { id: 'sm', label: 'Small (Compact)', sizeDesc: 'Fits maximum text per page' },
+                    { id: 'md', label: 'Medium (Standard)', sizeDesc: 'Balanced ATS standard' },
+                    { id: 'lg', label: 'Large (Expanded)', sizeDesc: 'High readability font size' },
+                  ].map((s) => (
+                    <button
+                      key={s.id}
+                      onClick={() => {
+                        if (onChangeTheme) onChangeTheme({ ...theme, fontSize: s.id as any });
+                        setShowFontSizeDropdown(false);
+                      }}
+                      className={`w-full p-2 rounded-lg text-left transition-all cursor-pointer ${
+                        theme.fontSize === s.id
+                          ? 'bg-amber-50 border border-amber-200 text-amber-900 font-bold'
+                          : 'hover:bg-slate-50 text-slate-700'
+                      }`}
+                    >
+                      <div className="text-xs font-bold">{s.label}</div>
+                      <div className="text-[10px] text-slate-400">{s.sizeDesc}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}

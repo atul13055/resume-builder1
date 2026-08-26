@@ -190,8 +190,8 @@ Return a JSON object:
     }
   });
 
-  // AI Deep ATS Scoring & Keyword Analysis
-  app.post("/api/ai/score-ats", async (req, res) => {
+  // AI Deep ATS Scoring & Keyword Analysis (supports both /api/ai/score-ats and /api/ai/ats-score)
+  app.post(["/api/ai/score-ats", "/api/ai/ats-score"], async (req, res) => {
     try {
       const { resumeData, jobDescription } = req.body;
       const ai = getAiClient();
@@ -276,8 +276,8 @@ Return a JSON object matching the requested schema.`;
     }
   });
 
-  // AI Resume Tailoring (Rewrite & Align with specific JD)
-  app.post("/api/ai/tailor", async (req, res) => {
+  // AI Resume Tailoring (supports both /api/ai/tailor and /api/ai/tailor-resume)
+  app.post(["/api/ai/tailor", "/api/ai/tailor-resume"], async (req, res) => {
     try {
       const { resumeData, jobDescription } = req.body;
       const ai = getAiClient();
@@ -356,8 +356,8 @@ Return JSON matching the schema.`;
     }
   });
 
-  // AI Cover Letter Generator
-  app.post("/api/ai/generate-cover-letter", async (req, res) => {
+  // AI Cover Letter Generator (supports both /api/ai/cover-letter and /api/ai/generate-cover-letter)
+  app.post(["/api/ai/cover-letter", "/api/ai/generate-cover-letter"], async (req, res) => {
     try {
       const { resumeData, jobDescription, companyName, hiringManager, tone } = req.body;
       const ai = getAiClient();
@@ -410,7 +410,10 @@ Return JSON:
       });
 
       const data = JSON.parse(response.text || "{}");
-      res.json(data);
+      res.json({
+        ...data,
+        coverLetter: data.letter || data.coverLetter || "",
+      });
     } catch (err: any) {
       console.error("AI Cover Letter Error:", err);
       res.status(500).json({ error: err.message || "Failed to generate cover letter." });
