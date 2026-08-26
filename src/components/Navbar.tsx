@@ -33,6 +33,8 @@ interface NavbarProps {
   resume: ResumeData;
   theme: ThemeConfig;
   atsScore: number;
+  lastSavedTime?: string;
+  isSaving?: boolean;
   canUndo?: boolean;
   canRedo?: boolean;
   undoCount?: number;
@@ -59,6 +61,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   resume,
   theme,
   atsScore,
+  lastSavedTime = 'Just now',
+  isSaving = false,
   canUndo = false,
   canRedo = false,
   undoCount = 0,
@@ -263,6 +267,31 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </div>
           )}
+        </div>
+
+        {/* Auto-Save LocalStorage Status Pill */}
+        <div
+          id="nav-autosave-status-pill"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-800 border border-slate-700/90 text-xs text-slate-300 transition-all cursor-pointer select-none"
+          title={`Real-Time Auto-Save is active. All resume changes are automatically saved to LocalStorage (${lastSavedTime}). Click to manually save.`}
+          onClick={() => {
+            try {
+              localStorage.setItem('resumebuilder_saved_resume_v1', JSON.stringify(resume));
+              alert(`✅ Resume manually saved to LocalStorage at ${lastSavedTime}!`);
+            } catch (e) {
+              console.error(e);
+            }
+          }}
+        >
+          {isSaving ? (
+            <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping shrink-0" />
+          ) : (
+            <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-xs shadow-emerald-400/50 shrink-0" />
+          )}
+          <span className="font-semibold text-slate-200 text-[11px]">
+            {isSaving ? 'Saving...' : 'Auto-Saved'}
+          </span>
+          <span className="text-[9.5px] text-slate-400 font-mono">({lastSavedTime})</span>
         </div>
 
         {/* LinkedIn Import Button */}

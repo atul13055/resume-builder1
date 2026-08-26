@@ -109,11 +109,23 @@ export default function App() {
     }
   };
 
+  // Auto-save status tracking
+  const [lastSavedTime, setLastSavedTime] = useState<string>('Just now');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
   // Auto-save to localStorage
   useEffect(() => {
     try {
       if (resume?.personalInfo) {
+        setIsSaving(true);
         localStorage.setItem(STORAGE_KEY_RESUME, JSON.stringify(resume));
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const timer = setTimeout(() => {
+          setLastSavedTime(timeStr);
+          setIsSaving(false);
+        }, 250);
+        return () => clearTimeout(timer);
       }
     } catch (e) {
       console.error('Auto-save resume error:', e);
@@ -227,6 +239,8 @@ export default function App() {
             resume={resume}
             theme={theme}
             atsScore={atsAnalysis.overallScore}
+            lastSavedTime={lastSavedTime}
+            isSaving={isSaving}
             canUndo={canUndo}
             canRedo={canRedo}
             undoCount={undoCount}
